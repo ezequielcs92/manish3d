@@ -1,0 +1,34 @@
+import type { StoreProduct } from "@/lib/store/types";
+
+export const demoProducts: StoreProduct[] = [
+  {
+    id: "demo-calma-dragon",
+    name: "Dragón Flexi Calma",
+    slug: "dragon-flexi-calma",
+    line: "calma",
+    description: "Juguete articulado impreso en 3D para manipular, regular ansiedad y acompañar momentos de pausa.",
+    price: 8500,
+    stock: null,
+    images: [],
+  },
+  {
+    id: "demo-lectura-marcador",
+    name: "Marcador Portal",
+    slug: "marcador-portal",
+    line: "lectura",
+    description: "Marcador rígido con diseño geométrico, liviano y resistente para lectores intensivos.",
+    price: 4200,
+    stock: 8,
+    images: [],
+  },
+  {
+    id: "demo-servicio-pieza",
+    name: "Pedido Personalizado",
+    slug: "pedido-personalizado",
+    line: "servicio",
+    description: "Servicio para piezas a medida desde archivo STL, referencia visual o descripción de necesidad.",
+    price: 12000,
+    stock: null,
+    images: [],
+  },
+];

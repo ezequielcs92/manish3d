@@ -1,36 +1,101 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Manish 3D
 
-## Getting Started
+Plataforma Next.js para tienda pública, checkout y panel de administración de Manish 3D.
 
-First, run the development server:
+## Fase 1
+
+Incluye:
+
+- Next.js App Router con TypeScript y Tailwind CSS.
+- Supabase Auth configurado desde clientes browser, server y middleware.
+- Rutas base `/login`, `/registro` y `/admin`.
+- Middleware que bloquea `/admin/*` si no hay sesión o si el rol no es interno.
+- Migración inicial con tablas, enums, triggers, índices y Row Level Security.
+
+## Fase 2
+
+Incluye MVP interno:
+
+- Layout de panel administrativo con navegación por rol.
+- Dashboard con facturación del mes, pedidos activos, productos activos y últimos pedidos.
+- CRUD mínimo de productos: creación y listado.
+- Gestión básica de pedidos: creación manual por canal y cambio de estado.
+- Vista de clientes y ventas invitadas.
+- Producción: cola activa y stock de materiales.
+- Finanzas: movimientos operativos e indicadores básicos.
+
+Permisos del panel:
+
+- `superadmin`: acceso completo.
+- `admin_operativo`: productos, pedidos, clientes, producción y finanzas operativas.
+- `vendedor`: dashboard, pedidos y clientes; sin productos, stock ni finanzas.
+
+## Fase 3
+
+Incluye MVP de tienda pública:
+
+- Home pública con catálogo filtrable por línea.
+- Detalle de producto en `/producto/[slug]`.
+- Carrito en `/carrito` persistido en `localStorage`.
+- Checkout en `/checkout` con datos de contacto y entrega.
+- API `/api/checkout` que valida productos, crea pedido, items y preferencia MercadoPago.
+- Webhook `/api/webhook/mercadopago` con validación de firma antes de actualizar pagos.
+- Seguimiento público de pedido en `/pedido/[id]`.
+
+Si `MERCADOPAGO_ACCESS_TOKEN` no está configurado, el checkout crea el pedido y redirige al seguimiento para poder probar el flujo localmente sin pagos reales.
+
+## Configuración Local
+
+1. Instalá dependencias:
+
+```bash
+npm install
+```
+
+2. Copiá `.env.local.example` a `.env.local` y completá Supabase:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+MERCADOPAGO_ACCESS_TOKEN=
+MERCADOPAGO_WEBHOOK_SECRET=
+NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY=
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+```
+
+3. Aplicá la migración `supabase/migrations/20260630165000_initial_schema.sql` en Supabase.
+
+Podés usar el SQL Editor de Supabase o el Supabase CLI si lo configurás para el proyecto.
+
+4. Levantá el servidor:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Roles
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Las cuentas creadas desde `/registro` nacen como `cliente` por seguridad. Para habilitar acceso al panel, cambiá el rol en `public.users` desde Supabase a uno de estos valores:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `superadmin`
+- `admin_operativo`
+- `vendedor`
 
-## Learn More
+## Activar El Catálogo Real
 
-To learn more about Next.js, take a look at the following resources:
+1. Configurá `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` y `SUPABASE_SERVICE_ROLE_KEY` en `.env.local`.
+2. Ejecutá la migración inicial en el SQL Editor de Supabase.
+3. Creá una cuenta en `/registro` y asignale el rol `superadmin` desde la tabla `public.users` en Supabase.
+4. Ingresá a `/admin/productos` y cargá los productos. Al existir configuración de Supabase, `/tienda` deja de usar los productos demo y muestra solo los productos activos de la base de datos.
+5. Las imágenes son opcionales. Pegá URLs públicas HTTPS, una por línea, desde Supabase Storage u otro host público; la primera se usa como imagen de portada.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Para que el checkout público cree pedidos reales, las tres variables de Supabase anteriores deben estar presentes. MercadoPago se puede configurar después: sin `MERCADOPAGO_ACCESS_TOKEN`, el pedido se crea y el cliente se redirige a su seguimiento.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Scripts
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm run dev
+npm run lint
+npm run build
+```
