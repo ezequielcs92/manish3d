@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { PriceCalculator } from "@/components/calculadora/price-calculator";
+import { getCalculatorSettings } from "@/lib/calculadora/settings";
 
-export default function AdminCalculadoraPage() {
+export default async function AdminCalculadoraPage() {
+  const settings = await getCalculatorSettings();
+
   return (
     <div className="space-y-6">
       <header className="rounded-[2rem] border border-[#441a66]/10 bg-white p-6 shadow-[0_18px_60px_rgba(16,9,27,0.07)]">
@@ -24,7 +27,10 @@ export default function AdminCalculadoraPage() {
       </header>
 
       <div className="overflow-hidden rounded-[2rem] border border-[#441a66]/10 bg-white shadow-[0_18px_60px_rgba(16,9,27,0.07)]">
-        <PriceCalculator variant="light" />
+        <PriceCalculator
+          variant="light"
+          tariff={{ electricityCostPerKwh: settings.electricityCostPerKwh, note: settings.note }}
+        />
       </div>
     </div>
   );

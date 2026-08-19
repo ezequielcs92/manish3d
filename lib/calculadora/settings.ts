@@ -4,6 +4,9 @@ import { regions, SETTINGS_REGION_CODE } from "./model";
 
 export const ELECTRICITY_SETTING_KEY = "electricity_cost_per_kwh";
 
+/** Tope de espera para no bloquear el render si Supabase está caído. */
+const SETTINGS_TIMEOUT_MS = 2000;
+
 export type CalculatorSettings = {
   electricityCostPerKwh: number;
   note: string | null;
@@ -33,6 +36,8 @@ export async function getCalculatorSettings(): Promise<CalculatorSettings> {
       .from("calculator_settings")
       .select("value, note, updated_at")
       .eq("key", ELECTRICITY_SETTING_KEY)
+      // Si la base no responde, la calculadora abre igual con el valor por defecto.
+      .abortSignal(AbortSignal.timeout(SETTINGS_TIMEOUT_MS))
       .maybeSingle();
 
     if (error || !data) return fallbackSettings();

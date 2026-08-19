@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import {
+  applyTariff,
   calculate,
   createInitialState,
   defaultMachines,
@@ -9,7 +10,6 @@ import {
   printTypes,
   regions,
   marketRateFor,
-  SETTINGS_REGION_CODE,
   type CalculatorState,
   type Machine,
   type TariffSettings,
@@ -77,8 +77,15 @@ function MachineSettings({ machine, onChange }: { machine: Machine; onChange: (m
   );
 }
 
-export function PriceCalculator({ variant = "dark" }: { variant?: CalculatorVariant }) {
-  const [state, setState] = useState<CalculatorState>(() => createInitialState());
+export function PriceCalculator({
+  variant = "dark",
+  tariff,
+}: {
+  variant?: CalculatorVariant;
+  /** Tarifa vigente leída en el servidor; si falta, se usa el valor de la región. */
+  tariff?: TariffSettings | null;
+}) {
+  const [state, setState] = useState<CalculatorState>(() => createInitialState(regions[1], tariff));
   const [machines, setMachines] = useState<Machine[]>(defaultMachines);
   const [advanced, setAdvanced] = useState(false);
   const [showMachineSettings, setShowMachineSettings] = useState(false);
@@ -90,6 +97,7 @@ export function PriceCalculator({ variant = "dark" }: { variant?: CalculatorVari
     [machines, state.machineId],
   );
   const region = useMemo(() => regions.find((item) => item.code === state.countryCode), [state.countryCode]);
+  const tariffNote = region ? applyTariff(region, tariff).tariffNote : null;
   const results = useMemo(() => calculate(state, machine), [state, machine]);
   const isValid = state.gramsTotal > 0 && (state.printTimeHours > 0 || state.printTimeMinutes > 0);
 
@@ -119,7 +127,7 @@ export function PriceCalculator({ variant = "dark" }: { variant?: CalculatorVari
       currencyIso: region.currencyIso,
       locale: region.locale,
       exchangeRate: region.exchangeRate,
-      electricityCostPerKwh: region.avgElectricityCost,
+      electricityCostPerKwh: applyTariff(region, tariff).electricityCostPerKwh,
       laborCostPerHour: region.defaultLaborCost,
       materialPricePerKg: region.defaultMaterialCost,
       marketRatePerHour: marketRateFor(region),
@@ -417,8 +425,8 @@ export function PriceCalculator({ variant = "dark" }: { variant?: CalculatorVari
                         value={state.electricityCostPerKwh}
                         onChange={(event) => update("electricityCostPerKwh", numeric(event.target.value))}
                       />
-                      {region?.tariffNote ? (
-                        <span className="text-[10px] leading-relaxed text-[var(--calc-muted)]">{region.tariffNote}</span>
+                      {tariffNote ? (
+                        <span className="text-[10px] leading-relaxed text-[var(--calc-muted)]">{tariffNote}</span>
                       ) : null}
                     </Field>
                     <Field label="Riesgo de falla (%)" icon={<AlertIcon />}>

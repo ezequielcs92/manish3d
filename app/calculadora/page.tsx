@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 import { PriceCalculator } from "@/components/calculadora/price-calculator";
 import { StoreFooter } from "@/components/tienda/store-footer";
 import { StoreHeader } from "@/components/tienda/store-header";
+import { getCalculatorSettings } from "@/lib/calculadora/settings";
+
+// La tarifa se lee en cada visita, así un cambio en el panel se ve al instante.
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Calculadora de impresión 3D: costo y precio de venta | Manish 3D",
@@ -9,7 +13,9 @@ export const metadata: Metadata = {
     "Calculá gratis el costo y el precio de venta de tus impresiones 3D: filamento, electricidad, tiempo de máquina, desgaste, riesgo de falla y margen.",
 };
 
-export default function CalculadoraPage() {
+export default async function CalculadoraPage() {
+  const settings = await getCalculatorSettings();
+
   return (
     <main className="min-h-screen bg-[#0d0c0f] text-white">
       <StoreHeader />
@@ -22,7 +28,10 @@ export default function CalculadoraPage() {
           </p>
         </div>
       </section>
-      <PriceCalculator variant="dark" />
+      <PriceCalculator
+        variant="dark"
+        tariff={{ electricityCostPerKwh: settings.electricityCostPerKwh, note: settings.note }}
+      />
       <StoreFooter />
     </main>
   );

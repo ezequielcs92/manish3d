@@ -134,7 +134,22 @@ export type CalculatorState = {
   chargeEnergy: boolean;
 };
 
-export function createInitialState(region: Region = regions[1]): CalculatorState {
+/**
+ * Los ajustes cargados en el panel mandan sobre los valores por defecto del
+ * código, pero solo para la región que administra el taller.
+ */
+export function applyTariff(region: Region, tariff?: TariffSettings | null) {
+  if (!tariff || region.code !== SETTINGS_REGION_CODE) {
+    return { electricityCostPerKwh: region.avgElectricityCost, tariffNote: region.tariffNote ?? null };
+  }
+
+  return {
+    electricityCostPerKwh: tariff.electricityCostPerKwh,
+    tariffNote: tariff.note ?? region.tariffNote ?? null,
+  };
+}
+
+export function createInitialState(region: Region = regions[1], tariff?: TariffSettings | null): CalculatorState {
   return {
     mode: "service",
     countryCode: region.code,
@@ -152,7 +167,7 @@ export function createInitialState(region: Region = regions[1]): CalculatorState
     delivery: "Normal",
     quantity: 1,
     manualPrice: null,
-    electricityCostPerKwh: region.avgElectricityCost,
+    electricityCostPerKwh: applyTariff(region, tariff).electricityCostPerKwh,
     laborCostPerHour: region.defaultLaborCost,
     prepTimeMinutes: 10,
     postTimeMinutes: 5,
