@@ -194,26 +194,33 @@ export function PriceCalculator({
               ))}
             </select>
 
-            <button
-              type="button"
-              onClick={() => setAdvanced((value) => !value)}
-              aria-pressed={advanced}
-              className="relative flex w-40 items-center rounded-full border border-[var(--calc-border)] bg-[var(--calc-bg)] p-1"
-            >
+            <div className="relative inline-flex rounded-full border border-[var(--calc-border)] bg-[var(--calc-bg)] p-1">
               <span
-                className={`absolute inset-y-1 w-[calc(50%-4px)] rounded-full transition-all duration-300 ${
-                  advanced ? "left-[calc(50%+2px)] bg-[var(--calc-accent)]" : "left-1 bg-[var(--calc-border)]"
-                }`}
+                aria-hidden="true"
+                style={{ transform: advanced ? "translateX(100%)" : "translateX(0)" }}
+                className="absolute inset-y-1 left-1 w-[calc(50%-0.25rem)] rounded-full bg-[var(--calc-accent)] transition-transform duration-300 ease-out"
               />
-              <span className="relative z-10 grid w-full grid-cols-2 text-center">
-                <span className={`py-1.5 text-xs font-bold transition ${advanced ? "text-[var(--calc-muted)]" : "text-[var(--calc-text)]"}`}>
-                  Simple
-                </span>
-                <span className={`py-1.5 text-xs font-bold transition ${advanced ? "text-white" : "text-[var(--calc-muted)]"}`}>
-                  Avanzado
-                </span>
-              </span>
-            </button>
+              <button
+                type="button"
+                onClick={() => setAdvanced(false)}
+                aria-pressed={!advanced}
+                className={`relative z-10 w-24 rounded-full px-3 py-1.5 text-xs font-bold transition-colors ${
+                  advanced ? "text-[var(--calc-muted)] hover:text-[var(--calc-text)]" : "text-white"
+                }`}
+              >
+                Simple
+              </button>
+              <button
+                type="button"
+                onClick={() => setAdvanced(true)}
+                aria-pressed={advanced}
+                className={`relative z-10 w-24 rounded-full px-3 py-1.5 text-xs font-bold transition-colors ${
+                  advanced ? "text-white" : "text-[var(--calc-muted)] hover:text-[var(--calc-text)]"
+                }`}
+              >
+                Avanzado
+              </button>
+            </div>
           </div>
         </div>
 
