@@ -4,6 +4,28 @@ import { StoreFooter } from "@/components/tienda/store-footer";
 import { StoreHeader } from "@/components/tienda/store-header";
 import { legalConfig } from "@/lib/legal/config";
 
+/**
+ * Fragmento de frase con el canal de contacto. Se usa como complemento de
+ * "Escribinos ___", así que incluye la preposición cuando hay casilla cargada.
+ */
+export function ContactChannel() {
+  if (!legalConfig.contactEmail) {
+    return <>por los mismos canales por los que hacés tus compras</>;
+  }
+
+  return (
+    <>
+      a{" "}
+      <a
+        href={`mailto:${legalConfig.contactEmail}`}
+        className="font-bold text-[#a772ca] underline-offset-4 hover:underline"
+      >
+        {legalConfig.contactEmail}
+      </a>
+    </>
+  );
+}
+
 export function LegalSection({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="border-t border-white/10 pt-7">
@@ -58,14 +80,7 @@ export function LegalPage({
         <section className="rounded-[2rem] border border-white/10 bg-[#151317] p-6 sm:p-8">
           <h2 className="text-xl font-black tracking-[-0.02em]">¿Dudas sobre tus datos?</h2>
           <p className="mt-3 text-sm leading-7 text-[#b8b5bd]">
-            Escribinos a{" "}
-            <a
-              href={`mailto:${legalConfig.contactEmail}`}
-              className="font-bold text-[#a772ca] underline-offset-4 hover:underline"
-            >
-              {legalConfig.contactEmail}
-            </a>{" "}
-            y te respondemos. También podés leer{" "}
+            Escribinos <ContactChannel /> y te respondemos. También podés leer{" "}
             <Link href="/privacidad" className="font-bold text-white underline-offset-4 hover:underline">
               la política de privacidad
             </Link>{" "}

@@ -4,7 +4,12 @@
  */
 export const legalConfig = {
   brandName: "Manish 3D",
-  contactEmail: "manishagencia@gmail.com",
+  /**
+   * Casilla propia de Manish 3D para ejercer derechos sobre datos personales.
+   * Mientras esté vacía, las páginas legales remiten a los canales de venta en
+   * vez de publicar una dirección que no le pertenece a la marca.
+   */
+  contactEmail: "",
   /** Razón social inscripta, si difiere del nombre comercial. */
   legalName: "",
   /** CUIT del responsable de la base de datos. */

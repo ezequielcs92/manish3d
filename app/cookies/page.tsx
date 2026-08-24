@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { LegalList, LegalPage, LegalSection } from "@/components/legal/legal-page";
-import { cookieNames, legalConfig } from "@/lib/legal/config";
+import { ContactChannel, LegalList, LegalPage, LegalSection } from "@/components/legal/legal-page";
+import { cookieNames } from "@/lib/legal/config";
 
 export const metadata: Metadata = {
   title: "Política de cookies | Manish 3D",
@@ -106,11 +106,7 @@ export default function CookiesPage() {
           <Link href="/privacidad" className="font-bold text-white underline-offset-4 hover:underline">
             política de protección de datos
           </Link>
-          . Ante cualquier duda, escribinos a{" "}
-          <a href={`mailto:${legalConfig.contactEmail}`} className="font-bold text-[#a772ca] underline-offset-4 hover:underline">
-            {legalConfig.contactEmail}
-          </a>
-          .
+          . Ante cualquier duda, escribinos <ContactChannel />.
         </p>
       </LegalSection>
     </LegalPage>

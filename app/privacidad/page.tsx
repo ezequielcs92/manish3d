@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { LegalList, LegalPage, LegalSection } from "@/components/legal/legal-page";
+import { ContactChannel, LegalList, LegalPage, LegalSection } from "@/components/legal/legal-page";
 import { legalConfig } from "@/lib/legal/config";
 
 export const metadata: Metadata = {
@@ -27,11 +27,7 @@ export default function PrivacidadPage() {
           {responsable ? ` ${responsable}.` : null}
         </p>
         <p>
-          Para cualquier consulta sobre el tratamiento de tus datos, escribinos a{" "}
-          <a href={`mailto:${legalConfig.contactEmail}`} className="font-bold text-[#a772ca] underline-offset-4 hover:underline">
-            {legalConfig.contactEmail}
-          </a>
-          .
+          Para cualquier consulta sobre el tratamiento de tus datos, escribinos <ContactChannel />.
         </p>
       </LegalSection>
 
@@ -118,12 +114,8 @@ export default function PrivacidadPage() {
       <LegalSection title="Tus derechos">
         <p>
           Podés pedirnos, en cualquier momento y sin costo, acceder a tus datos, corregirlos, actualizarlos o
-          eliminarlos. Escribinos a{" "}
-          <a href={`mailto:${legalConfig.contactEmail}`} className="font-bold text-[#a772ca] underline-offset-4 hover:underline">
-            {legalConfig.contactEmail}
-          </a>{" "}
-          desde el email de tu cuenta y lo resolvemos. Los datos de nombre, teléfono y dirección también los podés
-          editar vos mismo desde{" "}
+          eliminarlos. Escribinos <ContactChannel /> y lo resolvemos. Los datos de nombre, teléfono y dirección también
+          los podés editar vos mismo desde{" "}
           <Link href="/cuenta" className="font-bold text-white underline-offset-4 hover:underline">
             tu cuenta
           </Link>
