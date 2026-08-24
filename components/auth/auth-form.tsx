@@ -6,6 +6,10 @@ import { createClient } from "@/lib/supabase/client";
 
 type AuthMode = "login" | "registro";
 
+const inputClass =
+  "mt-2 w-full rounded-lg border border-white/10 bg-[#111013] px-4 py-3 font-medium text-white outline-none transition placeholder:text-[#77727c] focus:border-[#8a62ab] focus:ring-2 focus:ring-[#8a62ab]/30";
+const labelClass = "block text-xs font-bold uppercase tracking-[0.16em] text-[#8f8b94]";
+
 export function AuthForm({ mode }: { mode: AuthMode }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -41,41 +45,45 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
       return;
     }
 
-    if (mode === "registro") {
-      setMessage("Cuenta creada. Revisá tu email si Supabase requiere confirmación.");
+    // Sin confirmación por email, el alta ya deja sesión abierta y entra directo.
+    if (mode === "registro" && !result.data.session) {
+      setMessage("Cuenta creada. Revisá tu email para confirmarla y después ingresá.");
       return;
     }
 
-    router.push(searchParams.get("redirect") ?? "/admin");
+    router.push(searchParams.get("redirect") ?? "/cuenta");
     router.refresh();
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-5">
       {mode === "registro" ? (
-        <label className="block text-sm font-medium text-zinc-700">
+        <label className={labelClass}>
           Nombre completo
           <input
+            required
             name="full_name"
             type="text"
             autoComplete="name"
-            className="mt-2 w-full rounded-2xl border border-zinc-200 px-4 py-3 outline-none ring-orange-600 transition focus:ring-2"
+            placeholder="Como querés que te llamemos"
+            className={inputClass}
           />
         </label>
       ) : null}
 
-      <label className="block text-sm font-medium text-zinc-700">
+      <label className={labelClass}>
         Email
         <input
           required
           name="email"
           type="email"
           autoComplete="email"
-          className="mt-2 w-full rounded-2xl border border-zinc-200 px-4 py-3 outline-none ring-orange-600 transition focus:ring-2"
+          placeholder="tu@email.com"
+          className={inputClass}
         />
       </label>
 
-      <label className="block text-sm font-medium text-zinc-700">
+      <label className={labelClass}>
         Contraseña
         <input
           required
@@ -83,16 +91,25 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
           type="password"
           minLength={6}
           autoComplete={mode === "login" ? "current-password" : "new-password"}
-          className="mt-2 w-full rounded-2xl border border-zinc-200 px-4 py-3 outline-none ring-orange-600 transition focus:ring-2"
+          placeholder="Mínimo 6 caracteres"
+          className={inputClass}
         />
       </label>
 
-      {error ? <p className="text-sm font-medium text-red-700">{error}</p> : null}
-      {message ? <p className="text-sm font-medium text-green-700">{message}</p> : null}
+      {error ? (
+        <p className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm font-semibold text-red-300">
+          {error}
+        </p>
+      ) : null}
+      {message ? (
+        <p className="rounded-lg border border-[#8a62ab]/40 bg-[#6f2fa3]/15 px-4 py-3 text-sm font-semibold text-[#c4a6dd]">
+          {message}
+        </p>
+      ) : null}
 
       <button
         disabled={isSubmitting}
-        className="w-full rounded-full bg-zinc-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60"
+        className="shine-hover w-full rounded-full bg-[#6f2fa3] px-5 py-3.5 text-sm font-bold text-white shadow-[0_18px_45px_rgba(111,47,163,0.35)] transition hover:bg-[#8a62ab] disabled:cursor-not-allowed disabled:opacity-60"
       >
         {isSubmitting ? "Procesando..." : mode === "login" ? "Ingresar" : "Crear cuenta"}
       </button>

@@ -1,7 +1,21 @@
 import Image from "next/image";
 import Link from "next/link";
+import { hasSupabaseEnv } from "@/lib/env";
+import { createClient } from "@/lib/supabase/server";
 
-export function StoreFooter() {
+async function hasSession() {
+  if (!hasSupabaseEnv()) return false;
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  return Boolean(user);
+}
+
+export async function StoreFooter() {
+  const loggedIn = await hasSession();
+
   return (
     <footer className="border-t border-white/10 bg-[#09080a] text-white">
       <div className="mx-auto grid max-w-[90rem] gap-10 px-4 py-12 sm:px-6 md:grid-cols-2 lg:grid-cols-[1.35fr_0.65fr_0.65fr] lg:px-10">
@@ -22,12 +36,26 @@ export function StoreFooter() {
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#a772ca]">Mi compra</p>
           <div className="mt-4 flex flex-col gap-3 text-sm text-[#aaa6ae]">
             <Link href="/carrito" className="hover:text-white">Carrito</Link>
-            <Link href="/login" className="hover:text-white">Ingresar</Link>
-            <Link href="/registro" className="hover:text-white">Crear cuenta</Link>
+            {loggedIn ? (
+              <Link href="/cuenta" className="hover:text-white">Mi cuenta</Link>
+            ) : (
+              <>
+                <Link href="/login" className="hover:text-white">Ingresar</Link>
+                <Link href="/registro" className="hover:text-white">Crear cuenta</Link>
+              </>
+            )}
           </div>
         </div>
       </div>
-      <div className="border-t border-white/10 px-4 py-5 text-center text-xs text-[#68656c]">© 2026 Manish 3D. Hecho en Argentina.</div>
+      <div className="border-t border-white/10 px-4 py-5">
+        <div className="mx-auto flex max-w-[90rem] flex-col items-center gap-3 text-xs text-[#68656c] sm:flex-row sm:justify-between">
+          <p>© 2026 Manish 3D. Hecho en Argentina.</p>
+          <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
+            <Link href="/privacidad" className="transition hover:text-white">Protección de datos</Link>
+            <Link href="/cookies" className="transition hover:text-white">Cookies</Link>
+          </div>
+        </div>
+      </div>
     </footer>
   );
 }

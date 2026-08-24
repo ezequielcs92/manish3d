@@ -1,8 +1,24 @@
 import { NextResponse } from "next/server";
-import { hasSupabaseAdminEnv } from "@/lib/env";
+import { hasSupabaseAdminEnv, hasSupabaseEnv } from "@/lib/env";
 import { demoProducts } from "@/lib/store/demo-products";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
 import type { CheckoutItem } from "@/lib/store/types";
+
+/** Si quien compra tiene sesión, el pedido queda atado a su cuenta. */
+async function getBuyerId() {
+  if (!hasSupabaseEnv()) return null;
+
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    return user?.id ?? null;
+  } catch {
+    return null;
+  }
+}
 
 type CheckoutPayload = {
   clientName: string;
@@ -75,9 +91,12 @@ export async function POST(request: Request) {
   const validOrderItems = orderItems.filter((item) => item !== null);
   const total = validOrderItems.reduce((sum, item) => sum + item.unit_price * item.quantity, 0);
 
+  const buyerId = await getBuyerId();
+
   const { data: order, error: orderError } = await supabase
     .from("orders")
     .insert({
+      client_id: buyerId,
       client_name: payload.clientName,
       client_phone: payload.clientPhone,
       client_email: payload.clientEmail,

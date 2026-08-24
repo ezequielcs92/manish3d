@@ -48,6 +48,14 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
+  // El perfil es de cualquier cliente logueado, sin exigir rol interno.
+  if (request.nextUrl.pathname.startsWith("/cuenta") && !user) {
+    const redirectUrl = request.nextUrl.clone();
+    redirectUrl.pathname = "/login";
+    redirectUrl.searchParams.set("redirect", request.nextUrl.pathname);
+    return NextResponse.redirect(redirectUrl);
+  }
+
   if (request.nextUrl.pathname.startsWith("/admin")) {
     if (!user) {
       const redirectUrl = request.nextUrl.clone();

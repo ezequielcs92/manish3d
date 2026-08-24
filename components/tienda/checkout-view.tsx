@@ -26,7 +26,15 @@ function getCartSnapshot() {
   return JSON.stringify(readCart());
 }
 
-export function CheckoutView() {
+export type CheckoutDefaults = {
+  clientName?: string;
+  clientPhone?: string;
+  clientEmail?: string;
+  street?: string;
+  zone?: string;
+};
+
+export function CheckoutView({ defaults = {} }: { defaults?: CheckoutDefaults }) {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const cartSnapshot = useSyncExternalStore(subscribe, getCartSnapshot, () => "[]");
@@ -76,11 +84,11 @@ export function CheckoutView() {
         <p className="mt-3 max-w-2xl text-[#8f8b94]">Completá tus datos y te llevamos a MercadoPago. Después podés seguir el estado del pedido en tiempo real.</p>
 
         <div className="mt-8 grid gap-4 sm:grid-cols-2">
-          <input required name="client_name" placeholder="Nombre y apellido" className={inputClass} />
-          <input required name="client_phone" placeholder="WhatsApp" className={inputClass} />
-          <input required name="client_email" type="email" placeholder="Email" className={inputClass} />
-          <input name="zone" placeholder="Zona / localidad" className={inputClass} />
-          <input name="street" placeholder="Dirección de entrega" className={`${inputClass} sm:col-span-2`} />
+          <input required name="client_name" placeholder="Nombre y apellido" defaultValue={defaults.clientName ?? ""} className={inputClass} />
+          <input required name="client_phone" placeholder="WhatsApp" defaultValue={defaults.clientPhone ?? ""} className={inputClass} />
+          <input required name="client_email" type="email" placeholder="Email" defaultValue={defaults.clientEmail ?? ""} className={inputClass} />
+          <input name="zone" placeholder="Zona / localidad" defaultValue={defaults.zone ?? ""} className={inputClass} />
+          <input name="street" placeholder="Dirección de entrega" defaultValue={defaults.street ?? ""} className={`${inputClass} sm:col-span-2`} />
           <textarea name="notes" placeholder="Notas para producción o entrega" className={`${inputClass} min-h-28 sm:col-span-2`} />
         </div>
 

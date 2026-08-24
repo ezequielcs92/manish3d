@@ -1,7 +1,26 @@
 import Image from "next/image";
 import Link from "next/link";
+import { hasSupabaseEnv } from "@/lib/env";
+import { createClient } from "@/lib/supabase/server";
 
-export function StoreHeader() {
+async function getSessionName() {
+  if (!hasSupabaseEnv()) return null;
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return null;
+
+  const { data: profile } = await supabase.from("users").select("full_name").eq("id", user.id).single();
+  const name = profile?.full_name?.trim() || user.email?.split("@")[0] || "Mi cuenta";
+  return name.split(" ")[0];
+}
+
+export async function StoreHeader() {
+  const sessionName = await getSessionName();
+
   return (
     <header className="sticky top-0 z-50 text-white">
       <div className="bg-[#6f2fa3] px-4 py-2 text-center text-[0.66rem] font-bold uppercase tracking-[0.13em] sm:text-xs">
@@ -19,7 +38,16 @@ export function StoreHeader() {
             <Link className="transition hover:text-white" href="/tienda?linea=servicio">Personalizados</Link>
           </nav>
           <div className="flex items-center gap-1 sm:gap-2">
-            <Link href="/login" aria-label="Ingresar" className="hidden rounded-lg px-3 py-2 text-sm font-semibold text-[#b8b5bd] transition hover:bg-white/5 hover:text-white sm:inline-flex">Ingresar</Link>
+            {sessionName ? (
+              <Link href="/cuenta" className="hidden items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-[#b8b5bd] transition hover:bg-white/5 hover:text-white sm:inline-flex">
+                <span className="flex size-6 items-center justify-center rounded-full bg-[#6f2fa3] text-xs font-black text-white">
+                  {sessionName.charAt(0).toUpperCase()}
+                </span>
+                {sessionName}
+              </Link>
+            ) : (
+              <Link href="/login" aria-label="Ingresar" className="hidden rounded-lg px-3 py-2 text-sm font-semibold text-[#b8b5bd] transition hover:bg-white/5 hover:text-white sm:inline-flex">Ingresar</Link>
+            )}
             <Link href="/carrito" className="inline-flex items-center gap-2 rounded-lg border border-white/15 px-3 py-2 text-sm font-bold transition hover:border-[#8a62ab] hover:bg-[#6f2fa3]/15 sm:px-4">
               <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="size-5" stroke="currentColor" strokeWidth="1.8"><path d="M3 4h2l2.2 10.2a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.6L20.3 8H6.1"/><circle cx="10" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
               <span className="hidden sm:inline">Carrito</span>
@@ -31,7 +59,9 @@ export function StoreHeader() {
           <Link className="shrink-0 hover:text-white" href="/tienda?linea=calma">Calma</Link>
           <Link className="shrink-0 hover:text-white" href="/tienda?linea=lectura">Lectura</Link>
           <Link className="shrink-0 hover:text-white" href="/tienda?linea=servicio">Personalizados</Link>
-          <Link className="shrink-0 hover:text-white" href="/login">Ingresar</Link>
+          <Link className="shrink-0 hover:text-white" href={sessionName ? "/cuenta" : "/login"}>
+            {sessionName ? "Mi cuenta" : "Ingresar"}
+          </Link>
         </nav>
       </div>
     </header>
