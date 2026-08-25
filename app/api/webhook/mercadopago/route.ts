@@ -38,6 +38,18 @@ function isValidSignature({
   return expectedBuffer.length === receivedBuffer.length && timingSafeEqual(expectedBuffer, receivedBuffer);
 }
 
+/**
+ * Estados de MercadoPago llevados a los del pedido. "cancelled" es un pago que
+ * nunca se completó; "refunded" y "charged_back" son plata que ya había entrado
+ * y volvió, y por eso se tratan distinto: liberan stock y descuentan de la caja.
+ */
+function mapPaymentStatus(status: string) {
+  if (status === "approved") return "pagado";
+  if (status === "rejected" || status === "cancelled") return "fallido";
+  if (status === "refunded" || status === "charged_back") return "reembolsado";
+  return "pendiente";
+}
+
 export async function POST(request: Request) {
   const url = new URL(request.url);
   const body = await request.json();
@@ -73,7 +85,7 @@ export async function POST(request: Request) {
 
   const payment = await paymentResponse.json();
   const orderId = String(payment.external_reference ?? "");
-  const paymentStatus = payment.status === "approved" ? "pagado" : payment.status === "rejected" ? "fallido" : "pendiente";
+  const paymentStatus = mapPaymentStatus(String(payment.status ?? ""));
 
   if (!orderId) {
     return NextResponse.json({ received: true });
@@ -91,16 +103,23 @@ export async function POST(request: Request) {
 
   const estadoPrevio = pedidoPrevio?.payment_status ?? null;
 
-  await supabase
-    .from("orders")
-    .update({
-      payment_status: paymentStatus,
-      payment_id: String(payment.id),
-    })
-    .eq("id", orderId);
+  const cambios: Record<string, string> = {
+    payment_status: paymentStatus,
+    payment_id: String(payment.id),
+  };
 
-  // Un pago rechazado libera las unidades que se habían reservado al comprar.
-  if (paymentStatus === "fallido" && estadoPrevio !== "fallido") {
+  // Un pedido devuelto no tiene que seguir en la cola de producción.
+  if (paymentStatus === "reembolsado") {
+    cambios.status = "cancelado";
+  }
+
+  await supabase.from("orders").update(cambios).eq("id", orderId);
+
+  // Tanto el rechazo como la devolución liberan las unidades reservadas, pero
+  // solo la primera vez: MercadoPago repite la misma notificación.
+  const liberaStock = paymentStatus === "fallido" || paymentStatus === "reembolsado";
+
+  if (liberaStock && estadoPrevio !== paymentStatus) {
     const { data: items } = await supabase
       .from("order_items")
       .select("product_id, quantity")
@@ -108,6 +127,27 @@ export async function POST(request: Request) {
 
     if (items?.length) {
       await supabase.rpc("restore_stock", { items });
+    }
+  }
+
+  if (paymentStatus === "reembolsado") {
+    // El ingreso original queda asentado; la devolución se registra aparte para
+    // que la caja refleje las dos mitades del movimiento.
+    const descripcion = `Reembolso MercadoPago ${payment.id}`;
+    const { data: yaRegistrado } = await supabase
+      .from("transactions")
+      .select("id")
+      .eq("order_id", orderId)
+      .eq("description", descripcion)
+      .maybeSingle();
+
+    if (!yaRegistrado) {
+      await supabase.from("transactions").insert({
+        type: "reembolso",
+        amount: Number(payment.transaction_amount_refunded ?? payment.transaction_amount ?? 0),
+        description: descripcion,
+        order_id: orderId,
+      });
     }
   }
 

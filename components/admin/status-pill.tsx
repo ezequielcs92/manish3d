@@ -7,6 +7,7 @@ const toneByStatus: Record<string, string> = {
   cancelado: "bg-red-100 text-red-900 ring-red-200",
   pagado: "bg-emerald-100 text-emerald-900 ring-emerald-200",
   fallido: "bg-red-100 text-red-900 ring-red-200",
+  reembolsado: "bg-zinc-200 text-zinc-800 ring-zinc-300",
 };
 
 export function StatusPill({ status }: { status: string }) {

@@ -7,6 +7,7 @@ const toneByStatus: Record<string, string> = {
   cancelado: "border-red-400/30 bg-red-400/10 text-red-200",
   pagado: "border-emerald-400/30 bg-emerald-400/10 text-emerald-200",
   fallido: "border-red-400/30 bg-red-400/10 text-red-200",
+  reembolsado: "border-white/20 bg-white/10 text-[#d6d3da]",
 };
 
 /** Versión sobre fondo oscuro del pill que usa el panel interno. */
