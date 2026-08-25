@@ -1,8 +1,10 @@
+import type { ProductLine } from "./lines";
+
 export type StoreProduct = {
   id: string;
   name: string;
   slug: string;
-  line: "calma" | "lectura" | "servicio";
+  line: ProductLine;
   description: string | null;
   price: number;
   stock: number | null;

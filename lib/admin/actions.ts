@@ -50,6 +50,7 @@ export async function createProduct(formData: FormData) {
     price: getNumber(formData, "price"),
     cost: getNumber(formData, "cost"),
     stock: getNullableNumber(formData, "stock"),
+    weight_grams: getNullableNumber(formData, "weight_grams"),
     images: getImageUrls(formData),
     active: formData.get("active") === "on",
   });

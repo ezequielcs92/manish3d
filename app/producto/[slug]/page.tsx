@@ -7,14 +7,9 @@ import { StoreHeader } from "@/components/tienda/store-header";
 import { hasSupabaseEnv } from "@/lib/env";
 import { money } from "@/lib/format";
 import { demoProducts } from "@/lib/store/demo-products";
+import { getLine } from "@/lib/store/lines";
 import { createClient } from "@/lib/supabase/server";
 import type { StoreProduct } from "@/lib/store/types";
-
-const lineLabel = {
-  calma: "Línea Calma",
-  lectura: "Línea Lectura",
-  servicio: "Servicio personalizado",
-};
 
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -58,13 +53,13 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             </>
           )}
           <span className="absolute bottom-6 left-6 rounded-lg bg-black/30 px-4 py-2 backdrop-blur">
-            {lineLabel[product.line]}
+            {getLine(product.line)?.detail ?? product.line}
           </span>
         </div>
         <div className="rounded-2xl border border-white/10 bg-[#171519] p-7 sm:p-10">
           <Link href="/tienda" className="text-sm font-bold text-[#aaa6ae] transition hover:text-white">← Volver a la tienda</Link>
           <p className="mt-10 text-xs font-bold uppercase tracking-[0.22em] text-[#a772ca]">
-            {lineLabel[product.line]}
+            {getLine(product.line)?.detail ?? product.line}
           </p>
           <h1 className="mt-3 text-4xl font-black tracking-[-0.05em] sm:text-6xl">{product.name}</h1>
           <p className="mt-6 text-base leading-8 text-[#aaa6ae]">

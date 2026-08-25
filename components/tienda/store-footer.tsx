@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { hasSupabaseEnv } from "@/lib/env";
+import { lineHref, productLines } from "@/lib/store/lines";
 import { createClient } from "@/lib/supabase/server";
 
 async function hasSession() {
@@ -27,9 +28,9 @@ export async function StoreFooter() {
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#a772ca]">Tienda</p>
           <div className="mt-4 flex flex-col gap-3 text-sm text-[#aaa6ae]">
             <Link href="/tienda" className="hover:text-white">Todos los productos</Link>
-            <Link href="/tienda?linea=calma" className="hover:text-white">Línea Calma</Link>
-            <Link href="/tienda?linea=lectura" className="hover:text-white">Línea Lectura</Link>
-            <Link href="/tienda?linea=servicio" className="hover:text-white">Pedidos personalizados</Link>
+            {productLines.map((line) => (
+              <Link key={line.slug} href={lineHref(line.slug)} className="hover:text-white">{line.label}</Link>
+            ))}
           </div>
         </div>
         <div>

@@ -5,31 +5,16 @@ import { StoreHeader } from "@/components/tienda/store-header";
 import { hasSupabaseEnv } from "@/lib/env";
 import { demoProducts } from "@/lib/store/demo-products";
 import { createClient } from "@/lib/supabase/server";
+import { lineHref, productLines } from "@/lib/store/lines";
 import type { StoreProduct } from "@/lib/store/types";
 
-const categories = [
-  {
-    name: "Línea Calma",
-    text: "Flexis y objetos sensoriales para acompañar momentos de pausa.",
-    href: "/tienda?linea=calma",
-    number: "01",
-    className: "from-[#6f2fa3] to-[#321447]",
-  },
-  {
-    name: "Línea Lectura",
-    text: "Accesorios funcionales para quienes siempre tienen un libro cerca.",
-    href: "/tienda?linea=lectura",
-    number: "02",
-    className: "from-[#29252e] to-[#121014]",
-  },
-  {
-    name: "A tu medida",
-    text: "Transformamos tu archivo, referencia o idea en una pieza real.",
-    href: "/tienda?linea=servicio",
-    number: "03",
-    className: "from-[#5b5b61] to-[#28272b]",
-  },
-];
+const categories = productLines.map((line, index) => ({
+  name: line.home.name,
+  text: line.home.text,
+  href: lineHref(line.slug),
+  number: String(index + 1).padStart(2, "0"),
+  className: line.home.gradient,
+}));
 
 const benefits = [
   ["Hecho localmente", "Producimos cada pieza en zona norte de Buenos Aires."],
@@ -122,7 +107,7 @@ export default async function Home() {
           </div>
           <Link href="/tienda" className="text-sm font-bold text-[#b8b5bd] transition hover:text-white">Ver todo el catálogo →</Link>
         </div>
-        <div className="grid gap-4 lg:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {categories.map((category) => (
             <Link key={category.name} href={category.href} className={`group relative min-h-72 overflow-hidden rounded-2xl bg-gradient-to-br p-7 ${category.className}`}>
               <span className="absolute right-5 top-2 text-[7rem] font-black leading-none text-white/[0.06]">{category.number}</span>

@@ -1,4 +1,5 @@
 import { createProduct } from "@/lib/admin/actions";
+import { productLines } from "@/lib/store/lines";
 import { createClient } from "@/lib/supabase/server";
 
 function money(value: number) {
@@ -64,9 +65,11 @@ export default async function ProductosPage() {
           <input name="name" required placeholder="Nombre" className="w-full rounded-2xl border border-black/10 bg-[#f4eadc] px-4 py-3 outline-none focus:ring-2 focus:ring-[#a15f1b]" />
           <input name="slug" required placeholder="slug-del-producto" className="w-full rounded-2xl border border-black/10 bg-[#f4eadc] px-4 py-3 outline-none focus:ring-2 focus:ring-[#a15f1b]" />
           <select name="line" required className="w-full rounded-2xl border border-black/10 bg-[#f4eadc] px-4 py-3 outline-none focus:ring-2 focus:ring-[#a15f1b]">
-            <option value="calma">Línea Calma</option>
-            <option value="lectura">Línea Lectura</option>
-            <option value="servicio">Servicio</option>
+            {productLines.map((line) => (
+              <option key={line.slug} value={line.slug}>
+                {line.badge}
+              </option>
+            ))}
           </select>
            <textarea name="description" placeholder="Descripción" className="min-h-28 w-full rounded-2xl border border-black/10 bg-[#f4eadc] px-4 py-3 outline-none focus:ring-2 focus:ring-[#a15f1b]" />
           <textarea name="image_urls" placeholder="URLs de imágenes, una por línea (máximo 6)" className="min-h-24 w-full rounded-2xl border border-black/10 bg-[#f4eadc] px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-[#a15f1b]" />
@@ -74,7 +77,11 @@ export default async function ProductosPage() {
             <input name="price" required type="number" min="0" step="0.01" placeholder="Precio" className="rounded-2xl border border-black/10 bg-[#f4eadc] px-4 py-3 outline-none focus:ring-2 focus:ring-[#a15f1b]" />
             <input name="cost" type="number" min="0" step="0.01" placeholder="Costo" className="rounded-2xl border border-black/10 bg-[#f4eadc] px-4 py-3 outline-none focus:ring-2 focus:ring-[#a15f1b]" />
           </div>
-          <input name="stock" type="number" min="0" placeholder="Stock vacío = a pedido" className="w-full rounded-2xl border border-black/10 bg-[#f4eadc] px-4 py-3 outline-none focus:ring-2 focus:ring-[#a15f1b]" />
+          <div className="grid grid-cols-2 gap-3">
+            <input name="stock" type="number" min="0" placeholder="Stock vacío = a pedido" className="rounded-2xl border border-black/10 bg-[#f4eadc] px-4 py-3 outline-none focus:ring-2 focus:ring-[#a15f1b]" />
+            <input name="weight_grams" type="number" min="0" placeholder="Peso en gramos" className="rounded-2xl border border-black/10 bg-[#f4eadc] px-4 py-3 outline-none focus:ring-2 focus:ring-[#a15f1b]" />
+          </div>
+          <p className="-mt-1 text-xs text-[#8b6b4e]">El peso se usa para cotizar el envío con Andreani. Sin peso, ese producto no se puede cotizar.</p>
           <label className="flex items-center gap-2 text-sm font-medium text-[#6f5845]">
             <input name="active" type="checkbox" defaultChecked /> Activo en tienda
           </label>

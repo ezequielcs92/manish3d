@@ -92,6 +92,26 @@ export async function POST(request: Request) {
   const total = validOrderItems.reduce((sum, item) => sum + item.unit_price * item.quantity, 0);
 
   const buyerId = await getBuyerId();
+  const stockPayload = validOrderItems.map((item) => ({
+    product_id: item.product_id,
+    quantity: item.quantity,
+  }));
+
+  // Se reserva antes de crear el pedido: si no hay unidades, no queremos dejar
+  // un pedido colgado que después haya que cancelar a mano.
+  const { error: stockError } = await supabase.rpc("reserve_stock", { items: stockPayload });
+
+  if (stockError) {
+    const sinStock = stockError.message?.includes("STOCK_INSUFICIENTE");
+    return NextResponse.json(
+      {
+        error: sinStock
+          ? "Nos quedamos sin stock de alguno de los productos mientras comprabas. Revisá el carrito."
+          : "No se pudo reservar el stock.",
+      },
+      { status: sinStock ? 409 : 500 },
+    );
+  }
 
   const { data: order, error: orderError } = await supabase
     .from("orders")
@@ -110,6 +130,8 @@ export async function POST(request: Request) {
     .single();
 
   if (orderError || !order) {
+    // Sin pedido no hay nada que respalde la reserva: se devuelven las unidades.
+    await supabase.rpc("restore_stock", { items: stockPayload });
     return NextResponse.json({ error: "No se pudo crear el pedido." }, { status: 500 });
   }
 
@@ -123,6 +145,8 @@ export async function POST(request: Request) {
   );
 
   if (itemsError) {
+    await supabase.rpc("restore_stock", { items: stockPayload });
+    await supabase.from("orders").delete().eq("id", order.id);
     return NextResponse.json({ error: "No se pudieron guardar los items." }, { status: 500 });
   }
 

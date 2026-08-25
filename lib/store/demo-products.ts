@@ -22,6 +22,16 @@ export const demoProducts: StoreProduct[] = [
     images: [],
   },
   {
+    id: "demo-escena-props",
+    name: "Set de Props Escena",
+    slug: "set-props-escena",
+    line: "escena",
+    description: "Utilería impresa en 3D para obras, cosplays y producciones: réplicas livianas, resistentes y listas para pintar.",
+    price: 15000,
+    stock: null,
+    images: [],
+  },
+  {
     id: "demo-servicio-pieza",
     name: "Pedido Personalizado",
     slug: "pedido-personalizado",

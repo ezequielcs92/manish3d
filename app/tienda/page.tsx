@@ -4,15 +4,14 @@ import { StoreFooter } from "@/components/tienda/store-footer";
 import { StoreHeader } from "@/components/tienda/store-header";
 import { hasSupabaseEnv } from "@/lib/env";
 import { demoProducts } from "@/lib/store/demo-products";
+import { isProductLine, lineHref, productLines } from "@/lib/store/lines";
 import { createClient } from "@/lib/supabase/server";
 import type { StoreProduct } from "@/lib/store/types";
 
 const filters = [
-  ["Todos", "/tienda", undefined],
-  ["Línea Calma", "/tienda?linea=calma", "calma"],
-  ["Línea Lectura", "/tienda?linea=lectura", "lectura"],
-  ["Personalizados", "/tienda?linea=servicio", "servicio"],
-] as const;
+  { label: "Todos", href: "/tienda", value: undefined as string | undefined },
+  ...productLines.map((line) => ({ label: line.label, href: lineHref(line.slug), value: line.slug as string })),
+];
 
 export default async function TiendaPage({
   searchParams,
@@ -30,17 +29,17 @@ export default async function TiendaPage({
       .eq("active", true)
       .order("created_at", { ascending: false });
 
-    if (linea === "calma" || linea === "lectura" || linea === "servicio") {
+    if (isProductLine(linea)) {
       query = query.eq("line", linea);
     }
 
     const { data } = await query;
     products = data?.map((product) => ({ ...product, price: Number(product.price) })) ?? [];
-  } else if (linea === "calma" || linea === "lectura" || linea === "servicio") {
+  } else if (isProductLine(linea)) {
     products = demoProducts.filter((product) => product.line === linea);
   }
 
-  const activeLabel = filters.find(([, , value]) => value === linea)?.[0] ?? "Todos los productos";
+  const activeLabel = filters.find((filter) => filter.value === linea)?.label ?? "Todos los productos";
 
   return (
     <main className="min-h-screen bg-[#0d0c0f] text-white">
@@ -60,7 +59,7 @@ export default async function TiendaPage({
 
       <section className="mx-auto max-w-[90rem] px-4 py-10 sm:px-6 lg:px-10 lg:py-14">
         <div className="no-scrollbar mb-8 flex gap-2 overflow-x-auto pb-2">
-          {filters.map(([label, href, value]) => {
+          {filters.map(({ label, href, value }) => {
             const active = value === linea || (!value && !linea);
             return (
               <Link key={href} href={href} className={`shrink-0 rounded-lg border px-5 py-3 text-xs font-bold uppercase tracking-[0.1em] transition ${active ? "border-[#6f2fa3] bg-[#6f2fa3] text-white" : "border-white/10 bg-[#18161a] text-[#aaa6ae] hover:border-white/30 hover:text-white"}`}>

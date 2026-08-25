@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { hasSupabaseEnv } from "@/lib/env";
+import { lineHref, productLines } from "@/lib/store/lines";
 import { createClient } from "@/lib/supabase/server";
 
 async function getSessionName() {
@@ -33,9 +34,9 @@ export async function StoreHeader() {
           </Link>
           <nav className="hidden items-center gap-7 text-sm font-semibold text-[#b8b5bd] md:flex">
             <Link className="transition hover:text-white" href="/tienda">Tienda</Link>
-            <Link className="transition hover:text-white" href="/tienda?linea=calma">Calma</Link>
-            <Link className="transition hover:text-white" href="/tienda?linea=lectura">Lectura</Link>
-            <Link className="transition hover:text-white" href="/tienda?linea=servicio">Personalizados</Link>
+            {productLines.map((line) => (
+              <Link key={line.slug} className="transition hover:text-white" href={lineHref(line.slug)}>{line.nav}</Link>
+            ))}
           </nav>
           <div className="flex items-center gap-1 sm:gap-2">
             {sessionName ? (
@@ -56,9 +57,9 @@ export async function StoreHeader() {
         </div>
         <nav className="no-scrollbar flex gap-6 overflow-x-auto border-t border-white/5 px-4 py-3 text-xs font-bold uppercase tracking-[0.11em] text-[#8f8b94] md:hidden">
           <Link className="shrink-0 hover:text-white" href="/tienda">Todos</Link>
-          <Link className="shrink-0 hover:text-white" href="/tienda?linea=calma">Calma</Link>
-          <Link className="shrink-0 hover:text-white" href="/tienda?linea=lectura">Lectura</Link>
-          <Link className="shrink-0 hover:text-white" href="/tienda?linea=servicio">Personalizados</Link>
+          {productLines.map((line) => (
+            <Link key={line.slug} className="shrink-0 hover:text-white" href={lineHref(line.slug)}>{line.nav}</Link>
+          ))}
           <Link className="shrink-0 hover:text-white" href={sessionName ? "/cuenta" : "/login"}>
             {sessionName ? "Mi cuenta" : "Ingresar"}
           </Link>

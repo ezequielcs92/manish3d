@@ -79,6 +79,18 @@ export async function POST(request: Request) {
     })
     .eq("id", orderId);
 
+  // Un pago rechazado libera las unidades que se habían reservado al comprar.
+  if (paymentStatus === "fallido") {
+    const { data: items } = await supabase
+      .from("order_items")
+      .select("product_id, quantity")
+      .eq("order_id", orderId);
+
+    if (items?.length) {
+      await supabase.rpc("restore_stock", { items });
+    }
+  }
+
   if (paymentStatus === "pagado") {
     await supabase.from("transactions").insert({
       type: "ingreso",
