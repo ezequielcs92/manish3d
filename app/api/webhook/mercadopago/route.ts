@@ -41,6 +41,15 @@ function isValidSignature({
 export async function POST(request: Request) {
   const url = new URL(request.url);
   const body = await request.json();
+
+  // MercadoPago avisa de varios temas (merchant_order, planes, suscripciones).
+  // Solo los de pago traen un id que sirve contra /v1/payments; el resto se
+  // confirma con 200 para que no reintente eternamente.
+  const topic = String(body?.type ?? body?.topic ?? url.searchParams.get("type") ?? url.searchParams.get("topic") ?? "");
+  if (topic && topic !== "payment") {
+    return NextResponse.json({ received: true, ignored: topic });
+  }
+
   const dataId = String(body?.data?.id ?? body?.id ?? url.searchParams.get("data.id") ?? "");
   const requestId = request.headers.get("x-request-id") ?? "";
   const signature = request.headers.get("x-signature") ?? "";
@@ -71,6 +80,17 @@ export async function POST(request: Request) {
   }
 
   const supabase = createAdminClient();
+
+  // Se lee el estado previo para saber si esta notificación cambia algo: las
+  // repeticiones no tienen que volver a devolver stock ni sumar ingresos.
+  const { data: pedidoPrevio } = await supabase
+    .from("orders")
+    .select("payment_status")
+    .eq("id", orderId)
+    .maybeSingle();
+
+  const estadoPrevio = pedidoPrevio?.payment_status ?? null;
+
   await supabase
     .from("orders")
     .update({
@@ -80,7 +100,7 @@ export async function POST(request: Request) {
     .eq("id", orderId);
 
   // Un pago rechazado libera las unidades que se habían reservado al comprar.
-  if (paymentStatus === "fallido") {
+  if (paymentStatus === "fallido" && estadoPrevio !== "fallido") {
     const { data: items } = await supabase
       .from("order_items")
       .select("product_id, quantity")
@@ -92,12 +112,24 @@ export async function POST(request: Request) {
   }
 
   if (paymentStatus === "pagado") {
-    await supabase.from("transactions").insert({
-      type: "ingreso",
-      amount: Number(payment.transaction_amount ?? 0),
-      description: `Pago MercadoPago ${payment.id}`,
-      order_id: orderId,
-    });
+    // MercadoPago reintenta la misma notificación varias veces. Sin este chequeo,
+    // cada reintento sumaría otro ingreso y la caja quedaría inflada.
+    const descripcion = `Pago MercadoPago ${payment.id}`;
+    const { data: yaRegistrado } = await supabase
+      .from("transactions")
+      .select("id")
+      .eq("order_id", orderId)
+      .eq("description", descripcion)
+      .maybeSingle();
+
+    if (!yaRegistrado) {
+      await supabase.from("transactions").insert({
+        type: "ingreso",
+        amount: Number(payment.transaction_amount ?? 0),
+        description: descripcion,
+        order_id: orderId,
+      });
+    }
   }
 
   return NextResponse.json({ received: true });

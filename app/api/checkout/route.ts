@@ -150,10 +150,22 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "No se pudieron guardar los items." }, { status: 500 });
   }
 
+  // Deshacer todo si no se puede cobrar: sin esto quedaría un pedido "exitoso"
+  // sin pago y con stock descontado.
+  const cancelarPedido = async () => {
+    await supabase.from("order_items").delete().eq("order_id", order.id);
+    await supabase.from("orders").delete().eq("id", order.id);
+    await supabase.rpc("restore_stock", { items: stockPayload });
+  };
+
   const accessToken = process.env.MERCADOPAGO_ACCESS_TOKEN;
 
   if (!accessToken) {
-    return NextResponse.json({ orderId: order.id, initPoint: `${siteUrl}/pedido/${order.id}` });
+    await cancelarPedido();
+    return NextResponse.json(
+      { error: "Los pagos online todavía no están habilitados. Escribinos para coordinar tu compra." },
+      { status: 503 },
+    );
   }
 
   const preferenceResponse = await fetch("https://api.mercadopago.com/checkout/preferences", {
@@ -187,7 +199,13 @@ export async function POST(request: Request) {
   });
 
   if (!preferenceResponse.ok) {
-    return NextResponse.json({ orderId: order.id, initPoint: `${siteUrl}/pedido/${order.id}` });
+    const detalle = await preferenceResponse.text();
+    console.error("MercadoPago rechazó la preferencia", preferenceResponse.status, detalle);
+    await cancelarPedido();
+    return NextResponse.json(
+      { error: "No pudimos iniciar el pago. Probá de nuevo en un rato." },
+      { status: 502 },
+    );
   }
 
   const preference = await preferenceResponse.json();
