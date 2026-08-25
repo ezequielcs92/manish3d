@@ -9,6 +9,8 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
+  // Con dominio propio, las URLs de Open Graph y los canónicos salen absolutos.
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.manish3d.com"),
   title: "Manish 3D | Diseño e impresión 3D",
   description: "Productos de autor, accesorios y piezas personalizadas impresas en 3D. Producción local y envíos a todo el país.",
 };
