@@ -34,6 +34,42 @@ function getImageUrls(formData: FormData) {
     .slice(0, 6);
 }
 
+const IMAGENES_MAX = 6;
+const PESO_MAX_BYTES = 5 * 1024 * 1024;
+const TIPOS_ACEPTADOS = ["image/jpeg", "image/png", "image/webp", "image/avif"];
+
+/** Sube al bucket las fotos elegidas y devuelve sus URLs públicas. */
+async function subirFotos(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  formData: FormData,
+  slug: string,
+) {
+  const archivos = formData
+    .getAll("image_files")
+    .filter((item): item is File => item instanceof File && item.size > 0);
+
+  const urls: string[] = [];
+
+  for (const archivo of archivos.slice(0, IMAGENES_MAX)) {
+    if (!TIPOS_ACEPTADOS.includes(archivo.type) || archivo.size > PESO_MAX_BYTES) continue;
+
+    const extension = archivo.name.split(".").pop()?.toLowerCase() || "jpg";
+    // El slug ordena y el sufijo evita pisar una foto anterior del mismo producto.
+    const ruta = `${slug}/${Date.now()}-${urls.length}.${extension}`;
+
+    const { error } = await supabase.storage
+      .from("productos")
+      .upload(ruta, archivo, { contentType: archivo.type, upsert: false });
+
+    if (error) continue;
+
+    const { data } = supabase.storage.from("productos").getPublicUrl(ruta);
+    urls.push(data.publicUrl);
+  }
+
+  return urls;
+}
+
 export async function createProduct(formData: FormData) {
   const supabase = await createClient();
   const name = getString(formData, "name");
@@ -41,6 +77,9 @@ export async function createProduct(formData: FormData) {
   const line = getString(formData, "line");
 
   if (!name || !slug || !line) return;
+
+  const subidas = await subirFotos(supabase, formData, slug);
+  const images = [...subidas, ...getImageUrls(formData)].slice(0, IMAGENES_MAX);
 
   await supabase.from("products").insert({
     name,
@@ -51,12 +90,36 @@ export async function createProduct(formData: FormData) {
     cost: getNumber(formData, "cost"),
     stock: getNullableNumber(formData, "stock"),
     weight_grams: getNullableNumber(formData, "weight_grams"),
-    images: getImageUrls(formData),
+    images,
     active: formData.get("active") === "on",
   });
 
   revalidatePath("/admin");
   revalidatePath("/admin/productos");
+  revalidatePath("/tienda");
+}
+
+/** Edición rápida de lo que cambia seguido: precio, stock, peso y visibilidad. */
+export async function updateProduct(formData: FormData) {
+  const supabase = await createClient();
+  const id = getString(formData, "id");
+
+  if (!id) return;
+
+  await supabase
+    .from("products")
+    .update({
+      price: getNumber(formData, "price"),
+      cost: getNumber(formData, "cost"),
+      stock: getNullableNumber(formData, "stock"),
+      weight_grams: getNullableNumber(formData, "weight_grams"),
+      active: formData.get("active") === "on",
+    })
+    .eq("id", id);
+
+  revalidatePath("/admin");
+  revalidatePath("/admin/productos");
+  revalidatePath("/tienda");
 }
 
 export async function createManualOrder(formData: FormData) {

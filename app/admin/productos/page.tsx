@@ -1,6 +1,8 @@
-import { createProduct } from "@/lib/admin/actions";
+import { createProduct, updateProduct } from "@/lib/admin/actions";
 import { productLines } from "@/lib/store/lines";
 import { createClient } from "@/lib/supabase/server";
+
+const celdaClass = "w-24 rounded-lg border border-black/10 bg-[#f4eadc] px-2 py-1.5 text-sm outline-none focus:ring-2 focus:ring-[#a15f1b]";
 
 function money(value: number) {
   return new Intl.NumberFormat("es-AR", {
@@ -14,7 +16,7 @@ export default async function ProductosPage() {
   const supabase = await createClient();
   const { data: products } = await supabase
     .from("products")
-    .select("id, name, slug, line, price, cost, stock, active")
+    .select("id, name, slug, line, price, cost, stock, weight_grams, active")
     .order("created_at", { ascending: false });
 
   return (
@@ -41,12 +43,41 @@ export default async function ProductosPage() {
                     <td className="px-4 py-4">
                       <p className="font-semibold">{product.name}</p>
                       <p className="text-xs text-[#8b6b4e]">/{product.slug}</p>
+                      <p className="mt-1 font-mono text-sm font-semibold tabular-nums">
+                        {money(Number(product.price))}
+                        <span className="ml-2 text-xs font-normal text-[#8b6b4e]">
+                          {product.stock === null ? "a pedido" : `${product.stock} en stock`}
+                        </span>
+                      </p>
                     </td>
                     <td className="px-4 py-4">{product.line}</td>
-                    <td className="px-4 py-4 font-mono tabular-nums">{money(Number(product.price))}</td>
-                    <td className="px-4 py-4 font-mono tabular-nums">{money(Number(product.cost))}</td>
-                    <td className="px-4 py-4">{product.stock ?? "a pedido"}</td>
-                    <td className="px-4 py-4">{product.active ? "Activo" : "Oculto"}</td>
+                    <td className="px-4 py-4" colSpan={4}>
+                      <form action={updateProduct} className="flex flex-wrap items-center gap-2">
+                        <input type="hidden" name="id" value={product.id} />
+                        <label className="flex items-center gap-1 text-xs text-[#8b6b4e]">
+                          Precio
+                          <input name="price" type="number" min="0" step="0.01" defaultValue={Number(product.price)} className={celdaClass} />
+                        </label>
+                        <label className="flex items-center gap-1 text-xs text-[#8b6b4e]">
+                          Costo
+                          <input name="cost" type="number" min="0" step="0.01" defaultValue={Number(product.cost)} className={celdaClass} />
+                        </label>
+                        <label className="flex items-center gap-1 text-xs text-[#8b6b4e]">
+                          Stock
+                          <input name="stock" type="number" min="0" placeholder="a pedido" defaultValue={product.stock ?? ""} className={celdaClass} />
+                        </label>
+                        <label className="flex items-center gap-1 text-xs text-[#8b6b4e]">
+                          Peso g
+                          <input name="weight_grams" type="number" min="0" defaultValue={product.weight_grams ?? ""} className={celdaClass} />
+                        </label>
+                        <label className="flex items-center gap-1 text-xs font-medium text-[#6f5845]">
+                          <input name="active" type="checkbox" defaultChecked={product.active} /> Activo
+                        </label>
+                        <button className="rounded-full bg-[#21170f] px-4 py-2 text-xs font-bold text-[#fff7ed] transition hover:bg-[#3a2a1e]">
+                          Guardar
+                        </button>
+                      </form>
+                    </td>
                   </tr>
                 ))
               ) : (
@@ -72,7 +103,20 @@ export default async function ProductosPage() {
             ))}
           </select>
            <textarea name="description" placeholder="Descripción" className="min-h-28 w-full rounded-2xl border border-black/10 bg-[#f4eadc] px-4 py-3 outline-none focus:ring-2 focus:ring-[#a15f1b]" />
-          <textarea name="image_urls" placeholder="URLs de imágenes, una por línea (máximo 6)" className="min-h-24 w-full rounded-2xl border border-black/10 bg-[#f4eadc] px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-[#a15f1b]" />
+          <div className="rounded-2xl border border-dashed border-black/15 bg-[#f4eadc] p-4">
+            <label className="block text-xs font-bold uppercase tracking-[0.16em] text-[#8b6b4e]">
+              Fotos del producto
+              <input
+                name="image_files"
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/avif"
+                multiple
+                className="mt-2 block w-full text-sm file:mr-3 file:rounded-full file:border-0 file:bg-[#21170f] file:px-4 file:py-2 file:text-xs file:font-bold file:text-[#fff7ed]"
+              />
+            </label>
+            <p className="mt-2 text-xs text-[#8b6b4e]">Hasta 6 fotos, 5 MB cada una. JPG, PNG, WebP o AVIF.</p>
+          </div>
+          <textarea name="image_urls" placeholder="O pegá URLs de imágenes ya publicadas, una por línea" className="min-h-20 w-full rounded-2xl border border-black/10 bg-[#f4eadc] px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-[#a15f1b]" />
           <div className="grid grid-cols-2 gap-3">
             <input name="price" required type="number" min="0" step="0.01" placeholder="Precio" className="rounded-2xl border border-black/10 bg-[#f4eadc] px-4 py-3 outline-none focus:ring-2 focus:ring-[#a15f1b]" />
             <input name="cost" type="number" min="0" step="0.01" placeholder="Costo" className="rounded-2xl border border-black/10 bg-[#f4eadc] px-4 py-3 outline-none focus:ring-2 focus:ring-[#a15f1b]" />
