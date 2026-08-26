@@ -127,3 +127,14 @@ export async function createTransaction(formData: FormData) {
   revalidatePath("/admin");
   revalidatePath("/admin/finanzas");
 }
+
+export async function resolveRetraction(formData: FormData) {
+  const supabase = await createClient();
+  const id = getString(formData, "id");
+
+  if (!id) return;
+
+  await supabase.from("retraction_requests").update({ status: "resuelta" }).eq("id", id);
+
+  revalidatePath("/admin/solicitudes");
+}

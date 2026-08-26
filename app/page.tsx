@@ -160,6 +160,22 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* La Resolución 424/2020 exige el botón de arrepentimiento visible en la
+          home, no solo enterrado en los legales. */}
+      <section className="border-t border-white/10 bg-[#0d0c0f]">
+        <div className="mx-auto flex max-w-[90rem] flex-col items-center justify-between gap-4 px-4 py-7 sm:flex-row sm:px-6 lg:px-10">
+          <p className="text-center text-sm text-[#8f8b94] sm:text-left">
+            ¿Te arrepentiste de una compra? Tenés 10 días para cancelarla, sin costo.
+          </p>
+          <Link
+            href="/arrepentimiento"
+            className="inline-flex shrink-0 items-center rounded-lg border border-white/20 px-6 py-3 text-xs font-bold uppercase tracking-[0.1em] transition hover:border-[#8a62ab] hover:bg-[#6f2fa3]/15"
+          >
+            Botón de arrepentimiento
+          </Link>
+        </div>
+      </section>
+
       <StoreFooter />
     </main>
   );

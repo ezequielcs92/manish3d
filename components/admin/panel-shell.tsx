@@ -9,6 +9,7 @@ const navItems = [
   { label: "Producción", href: "/admin/produccion", roles: ["superadmin", "admin_operativo"] },
   { label: "Finanzas", href: "/admin/finanzas", roles: ["superadmin", "admin_operativo"] },
   { label: "Calculadora", href: "/admin/calculadora", roles: ["superadmin", "admin_operativo", "vendedor"] },
+  { label: "Arrepentimientos", href: "/admin/solicitudes", roles: ["superadmin", "admin_operativo", "vendedor"] },
 ];
 
 export function PanelShell({

@@ -52,8 +52,16 @@ export async function StoreFooter() {
         <div className="mx-auto flex max-w-[90rem] flex-col items-center gap-3 text-xs text-[#68656c] sm:flex-row sm:justify-between">
           <p>© 2026 Manish 3D. Hecho en Argentina.</p>
           <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
+            <Link href="/terminos" className="transition hover:text-white">Términos y condiciones</Link>
+            <Link href="/devoluciones" className="transition hover:text-white">Cambios y devoluciones</Link>
             <Link href="/privacidad" className="transition hover:text-white">Protección de datos</Link>
             <Link href="/cookies" className="transition hover:text-white">Cookies</Link>
+            <Link
+              href="/arrepentimiento"
+              className="rounded-full border border-white/20 px-3 py-1 font-bold text-[#aaa6ae] transition hover:border-[#8a62ab] hover:text-white"
+            >
+              Botón de arrepentimiento
+            </Link>
           </div>
         </div>
       </div>
