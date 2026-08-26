@@ -1,10 +1,11 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ProductCard } from "@/components/tienda/product-card";
 import { StoreFooter } from "@/components/tienda/store-footer";
 import { StoreHeader } from "@/components/tienda/store-header";
 import { hasSupabaseEnv } from "@/lib/env";
 import { demoProducts } from "@/lib/store/demo-products";
-import { isProductLine, lineHref, productLines } from "@/lib/store/lines";
+import { getLine, isProductLine, lineHref, productLines } from "@/lib/store/lines";
 import { createClient } from "@/lib/supabase/server";
 import type { StoreProduct } from "@/lib/store/types";
 
@@ -12,6 +13,27 @@ const filters = [
   { label: "Todos", href: "/tienda", value: undefined as string | undefined },
   ...productLines.map((line) => ({ label: line.label, href: lineHref(line.slug), value: line.slug as string })),
 ];
+
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<{ linea?: string }>;
+}): Promise<Metadata> {
+  const { linea } = await searchParams;
+  const line = isProductLine(linea) ? getLine(linea) : undefined;
+
+  const title = line ? `${line.label} | Tienda Manish 3D` : "Tienda | Manish 3D";
+  const description = line
+    ? line.home.text
+    : "Objetos de autor, accesorios y piezas personalizadas impresas en 3D. Producción local y envíos a todo el país.";
+
+  return {
+    title,
+    description,
+    alternates: { canonical: line ? `/tienda?linea=${line.slug}` : "/tienda" },
+    openGraph: { title, description, type: "website" },
+  };
+}
 
 export default async function TiendaPage({
   searchParams,
