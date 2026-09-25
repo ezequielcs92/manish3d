@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ProductCard } from "@/components/tienda/product-card";
 import { StoreFooter } from "@/components/tienda/store-footer";
@@ -79,7 +80,16 @@ export default async function Home() {
             <div className="absolute inset-[26%] rotate-12 rounded-[28%] bg-gradient-to-br from-[#8a62ab] via-[#441a66] to-[#1b0b26] shadow-[0_0_110px_rgba(111,47,163,0.45)]" />
             <div className="absolute inset-[30%] -rotate-6 rounded-[25%] border border-white/20 bg-white/5 backdrop-blur-md" />
             <div className="absolute inset-0 grid place-items-center">
-              <span className="text-[clamp(4rem,10vw,8.5rem)] font-black tracking-[-0.1em] text-white drop-shadow-2xl">3D</span>
+              {/* Versión clara del logo: los colores originales se pierden sobre el violeta. */}
+              <Image
+                src="/brand/logo-manish-3d-claro.svg"
+                alt="Manish 3D"
+                width={295}
+                height={318}
+                priority
+                unoptimized
+                className="h-auto w-[34%] drop-shadow-2xl"
+              />
             </div>
             <div className="absolute bottom-[8%] right-0 rounded-xl border border-white/10 bg-[#17151a]/90 px-5 py-4 shadow-2xl backdrop-blur">
               <p className="text-[0.65rem] font-bold uppercase tracking-[0.2em] text-[#a772ca]">Fabricación propia</p>
