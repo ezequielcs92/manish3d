@@ -1,5 +1,5 @@
 import { createProduct, updateProduct } from "@/lib/admin/actions";
-import { productLines } from "@/lib/store/lines";
+import { getLine, productLines } from "@/lib/store/lines";
 import { createClient } from "@/lib/supabase/server";
 
 const celdaClass = "w-24 rounded-lg border border-black/10 bg-[#f4eadc] px-2 py-1.5 text-sm outline-none focus:ring-2 focus:ring-[#a15f1b]";
@@ -16,7 +16,7 @@ export default async function ProductosPage() {
   const supabase = await createClient();
   const { data: products } = await supabase
     .from("products")
-    .select("id, name, slug, line, price, cost, stock, weight_grams, active")
+    .select("id, name, slug, line, price, cost, stock, weight_grams, images, active")
     .order("created_at", { ascending: false });
 
   return (
@@ -44,19 +44,19 @@ export default async function ProductosPage() {
                       <p className="font-semibold">{product.name}</p>
                       <p className="text-xs text-[#8b6b4e]">/{product.slug}</p>
                       <p className="mt-1 font-mono text-sm font-semibold tabular-nums">
-                        {money(Number(product.price))}
+                        {product.price === null ? "A consultar" : money(Number(product.price))}
                         <span className="ml-2 text-xs font-normal text-[#8b6b4e]">
                           {product.stock === null ? "a pedido" : `${product.stock} en stock`}
                         </span>
                       </p>
                     </td>
-                    <td className="px-4 py-4">{product.line}</td>
+                    <td className="px-4 py-4">{getLine(product.line)?.badge ?? product.line}</td>
                     <td className="px-4 py-4" colSpan={4}>
                       <form action={updateProduct} className="flex flex-wrap items-center gap-2">
                         <input type="hidden" name="id" value={product.id} />
                         <label className="flex items-center gap-1 text-xs text-[#8b6b4e]">
                           Precio
-                          <input name="price" type="number" min="0" step="0.01" defaultValue={Number(product.price)} className={celdaClass} />
+                          <input name="price" type="number" min="0" step="0.01" placeholder="consultar" defaultValue={product.price ?? ""} className={celdaClass} />
                         </label>
                         <label className="flex items-center gap-1 text-xs text-[#8b6b4e]">
                           Costo
@@ -72,6 +72,16 @@ export default async function ProductosPage() {
                         </label>
                         <label className="flex items-center gap-1 text-xs font-medium text-[#6f5845]">
                           <input name="active" type="checkbox" defaultChecked={product.active} /> Activo
+                        </label>
+                        <label className="flex items-center gap-1 text-xs text-[#8b6b4e]">
+                          Fotos ({product.images?.length ?? 0}/6)
+                          <input
+                            name="image_files"
+                            type="file"
+                            accept="image/jpeg,image/png,image/webp,image/avif"
+                            multiple
+                            className="w-44 text-xs file:mr-2 file:rounded-full file:border-0 file:bg-[#e9dccb] file:px-3 file:py-1 file:text-xs file:font-bold"
+                          />
                         </label>
                         <button className="rounded-full bg-[#21170f] px-4 py-2 text-xs font-bold text-[#fff7ed] transition hover:bg-[#3a2a1e]">
                           Guardar
@@ -118,7 +128,7 @@ export default async function ProductosPage() {
           </div>
           <textarea name="image_urls" placeholder="O pegá URLs de imágenes ya publicadas, una por línea" className="min-h-20 w-full rounded-2xl border border-black/10 bg-[#f4eadc] px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-[#a15f1b]" />
           <div className="grid grid-cols-2 gap-3">
-            <input name="price" required type="number" min="0" step="0.01" placeholder="Precio" className="rounded-2xl border border-black/10 bg-[#f4eadc] px-4 py-3 outline-none focus:ring-2 focus:ring-[#a15f1b]" />
+            <input name="price" type="number" min="0" step="0.01" placeholder="Precio (vacío = a consultar)" className="rounded-2xl border border-black/10 bg-[#f4eadc] px-4 py-3 outline-none focus:ring-2 focus:ring-[#a15f1b]" />
             <input name="cost" type="number" min="0" step="0.01" placeholder="Costo" className="rounded-2xl border border-black/10 bg-[#f4eadc] px-4 py-3 outline-none focus:ring-2 focus:ring-[#a15f1b]" />
           </div>
           <div className="grid grid-cols-2 gap-3">

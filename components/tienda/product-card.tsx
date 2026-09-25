@@ -3,7 +3,7 @@ import Image from "next/image";
 import { money } from "@/lib/format";
 import { getLine } from "@/lib/store/lines";
 import type { StoreProduct } from "@/lib/store/types";
-import { AddToCartButton } from "./add-to-cart-button";
+import { BuyOrAsk } from "./buy-or-ask";
 
 export function ProductCard({ product }: { product: StoreProduct }) {
   const line = getLine(product.line);
@@ -41,15 +41,15 @@ export function ProductCard({ product }: { product: StoreProduct }) {
             </h2>
           </div>
           <p className="shrink-0 text-right text-sm font-black tabular-nums text-white">
-            {money(product.price)}
+            {product.price === null ? "A consultar" : money(product.price)}
           </p>
         </div>
         <p className="mt-3 line-clamp-2 px-1 text-sm leading-6 text-[#8f8b94]">
-          {product.description ?? "Producto de impresión 3D con diseño propio de Manish 3D."}
+          {product.description ?? "Pieza impresa en 3D por Manish 3D."}
         </p>
       </div>
       <div className="mt-5 px-1 pb-1">
-        <AddToCartButton product={product} />
+        <BuyOrAsk product={product} />
       </div>
     </article>
   );

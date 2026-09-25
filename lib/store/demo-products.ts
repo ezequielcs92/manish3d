@@ -22,6 +22,16 @@ export const demoProducts: StoreProduct[] = [
     images: [],
   },
   {
+    id: "demo-juegos-torre-dados",
+    name: "Torre de Dados Modular",
+    slug: "torre-dados-modular",
+    line: "juegos",
+    description: "Torre desmontable para tirar dados con comodidad y mantener la mesa de juego ordenada.",
+    price: 13500,
+    stock: null,
+    images: [],
+  },
+  {
     id: "demo-escena-props",
     name: "Set de Props Escena",
     slug: "set-props-escena",

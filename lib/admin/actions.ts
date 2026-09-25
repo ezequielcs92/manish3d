@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { isProductLine } from "@/lib/store/lines";
 
 function getString(formData: FormData, key: string) {
   return String(formData.get(key) ?? "").trim();
@@ -76,7 +77,7 @@ export async function createProduct(formData: FormData) {
   const slug = getString(formData, "slug");
   const line = getString(formData, "line");
 
-  if (!name || !slug || !line) return;
+  if (!name || !slug || !isProductLine(line)) return;
 
   const subidas = await subirFotos(supabase, formData, slug);
   const images = [...subidas, ...getImageUrls(formData)].slice(0, IMAGENES_MAX);
@@ -86,7 +87,7 @@ export async function createProduct(formData: FormData) {
     slug,
     line,
     description: getString(formData, "description") || null,
-    price: getNumber(formData, "price"),
+    price: getNullableNumber(formData, "price"),
     cost: getNumber(formData, "cost"),
     stock: getNullableNumber(formData, "stock"),
     weight_grams: getNullableNumber(formData, "weight_grams"),
@@ -99,20 +100,31 @@ export async function createProduct(formData: FormData) {
   revalidatePath("/tienda");
 }
 
-/** Edición rápida de lo que cambia seguido: precio, stock, peso y visibilidad. */
+/**
+ * Edición rápida de lo que cambia seguido: precio, stock, peso y visibilidad.
+ * También suma fotos a un producto ya creado, que antes solo se podían cargar
+ * en el alta. Precio vacío deja el producto "a consultar".
+ */
 export async function updateProduct(formData: FormData) {
   const supabase = await createClient();
   const id = getString(formData, "id");
 
   if (!id) return;
 
+  const { data: actual } = await supabase.from("products").select("slug, images").eq("id", id).single();
+  if (!actual) return;
+
+  const subidas = await subirFotos(supabase, formData, actual.slug);
+  const images = [...(actual.images ?? []), ...subidas].slice(0, IMAGENES_MAX);
+
   await supabase
     .from("products")
     .update({
-      price: getNumber(formData, "price"),
+      price: getNullableNumber(formData, "price"),
       cost: getNumber(formData, "cost"),
       stock: getNullableNumber(formData, "stock"),
       weight_grams: getNullableNumber(formData, "weight_grams"),
+      images,
       active: formData.get("active") === "on",
     })
     .eq("id", id);

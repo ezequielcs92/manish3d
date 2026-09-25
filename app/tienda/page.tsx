@@ -56,7 +56,7 @@ export default async function TiendaPage({
     }
 
     const { data } = await query;
-    products = data?.map((product) => ({ ...product, price: Number(product.price) })) ?? [];
+    products = data?.map((product) => ({ ...product, price: product.price === null ? null : Number(product.price) })) ?? [];
   } else if (isProductLine(linea)) {
     products = demoProducts.filter((product) => product.line === linea);
   }

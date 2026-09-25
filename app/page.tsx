@@ -13,7 +13,8 @@ const categories = productLines.map((line, index) => ({
   text: line.home.text,
   href: lineHref(line.slug),
   number: String(index + 1).padStart(2, "0"),
-  className: line.home.gradient,
+  // "A tu medida" no es una colección más: cierra la grilla a lo ancho.
+  className: `${line.home.gradient} ${line.slug === "servicio" ? "sm:col-span-2 lg:col-span-3" : ""}`,
 }));
 
 const benefits = [
@@ -36,7 +37,7 @@ async function getFeaturedProducts() {
 
   return (data?.map((product) => ({
     ...product,
-    price: Number(product.price),
+    price: product.price === null ? null : Number(product.price),
   })) ?? []) as StoreProduct[];
 }
 
@@ -107,7 +108,7 @@ export default async function Home() {
           </div>
           <Link href="/tienda" className="text-sm font-bold text-[#b8b5bd] transition hover:text-white">Ver todo el catálogo →</Link>
         </div>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {categories.map((category) => (
             <Link key={category.name} href={category.href} className={`group relative min-h-72 overflow-hidden rounded-2xl bg-gradient-to-br p-7 ${category.className}`}>
               <span className="absolute right-5 top-2 text-[7rem] font-black leading-none text-white/[0.06]">{category.number}</span>

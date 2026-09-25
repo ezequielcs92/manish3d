@@ -32,7 +32,7 @@ export async function StoreHeader() {
           <Link href="/" className="shrink-0">
             <Image src="/brand/logo-header-exact.png" alt="Manish 3D" width={228} height={40} className="h-auto w-36 sm:w-48" priority unoptimized />
           </Link>
-          <nav className="hidden items-center gap-7 text-sm font-semibold text-[#b8b5bd] md:flex">
+          <nav className="hidden items-center gap-7 text-sm font-semibold text-[#b8b5bd] lg:flex">
             <Link className="transition hover:text-white" href="/tienda">Tienda</Link>
             {productLines.map((line) => (
               <Link key={line.slug} className="transition hover:text-white" href={lineHref(line.slug)}>{line.nav}</Link>
@@ -55,7 +55,7 @@ export async function StoreHeader() {
             </Link>
           </div>
         </div>
-        <nav className="no-scrollbar flex gap-6 overflow-x-auto border-t border-white/5 px-4 py-3 text-xs font-bold uppercase tracking-[0.11em] text-[#8f8b94] md:hidden">
+        <nav className="no-scrollbar flex gap-6 overflow-x-auto border-t border-white/5 px-4 py-3 text-xs font-bold uppercase tracking-[0.11em] text-[#8f8b94] lg:hidden">
           <Link className="shrink-0 hover:text-white" href="/tienda">Todos</Link>
           {productLines.map((line) => (
             <Link key={line.slug} className="shrink-0 hover:text-white" href={lineHref(line.slug)}>{line.nav}</Link>

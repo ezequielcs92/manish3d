@@ -5,7 +5,7 @@ import type { StoreProduct } from "@/lib/store/types";
 
 const CART_KEY = "manish3d.cart.v1";
 
-export function AddToCartButton({ product }: { product: StoreProduct }) {
+export function AddToCartButton({ product }: { product: StoreProduct & { price: number } }) {
   const [added, setAdded] = useState(false);
 
   function addToCart() {

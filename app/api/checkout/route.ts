@@ -72,6 +72,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "No se pudieron validar los productos." }, { status: 400 });
   }
 
+  // Un producto a consultar (precio nulo) nunca se cobra por acá: Number(null)
+  // daría 0 y el pedido saldría gratis. Puede llegar desde un carrito guardado
+  // antes de que el producto pasara a consulta, por eso se valida en el servidor.
+  if (products.some((product) => product.price === null)) {
+    return NextResponse.json(
+      { error: "Hay productos en tu carrito que se cotizan a consulta. Sacalos y escribinos por ellos." },
+      { status: 400 },
+    );
+  }
+
   const productMap = new Map(products.map((product) => [product.id, product]));
   const orderItems = cleanItems.map((item) => {
     const product = productMap.get(item.productId);

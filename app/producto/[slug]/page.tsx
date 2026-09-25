@@ -3,7 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { cache } from "react";
-import { AddToCartButton } from "@/components/tienda/add-to-cart-button";
+import { BuyOrAsk } from "@/components/tienda/buy-or-ask";
 import { StoreFooter } from "@/components/tienda/store-footer";
 import { StoreHeader } from "@/components/tienda/store-header";
 import { hasSupabaseEnv } from "@/lib/env";
@@ -28,7 +28,7 @@ const getProduct = cache(async (slug: string): Promise<StoreProduct | undefined>
     .eq("active", true)
     .single();
 
-  return data ? ({ ...data, price: Number(data.price) } as StoreProduct) : undefined;
+  return data ? ({ ...data, price: data.price === null ? null : Number(data.price) } as StoreProduct) : undefined;
 });
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
@@ -76,16 +76,19 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
     sku: product.id,
     url: `${siteUrl}/producto/${product.slug}`,
     brand: { "@type": "Brand", name: "Manish 3D" },
-    offers: {
-      "@type": "Offer",
-      url: `${siteUrl}/producto/${product.slug}`,
-      priceCurrency: "ARS",
-      price: product.price,
-      availability:
-        product.stock === null || product.stock > 0
-          ? "https://schema.org/InStock"
-          : "https://schema.org/OutOfStock",
-    },
+    offers:
+      product.price === null
+        ? undefined
+        : {
+            "@type": "Offer",
+            url: `${siteUrl}/producto/${product.slug}`,
+            priceCurrency: "ARS",
+            price: product.price,
+            availability:
+              product.stock === null || product.stock > 0
+                ? "https://schema.org/InStock"
+                : "https://schema.org/OutOfStock",
+          },
   };
 
   return (
@@ -123,14 +126,16 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
           </p>
           <h1 className="mt-3 text-4xl font-black tracking-[-0.05em] sm:text-6xl">{product.name}</h1>
           <p className="mt-6 text-base leading-8 text-[#aaa6ae]">
-            {product.description ?? "Producto de impresión 3D con diseño propio de Manish 3D."}
+            {product.description ?? "Pieza impresa en 3D por Manish 3D."}
           </p>
           <div className="mt-8 border-t border-white/10 pt-8">
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.15em] text-[#77727c]">Precio</p>
-              <p className="mt-2 text-4xl font-black tabular-nums text-white">{money(product.price)}</p>
+              <p className="mt-2 text-4xl font-black tabular-nums text-white">
+                {product.price === null ? "A consultar" : money(product.price)}
+              </p>
             </div>
-            <div className="mt-6"><AddToCartButton product={product} /></div>
+            <div className="mt-6"><BuyOrAsk product={product} /></div>
             <div className="mt-6 grid grid-cols-2 gap-3 border-t border-white/10 pt-6 text-xs text-[#8f8b94]">
               <p>✓ Producción local</p>
               <p>✓ Compra segura</p>

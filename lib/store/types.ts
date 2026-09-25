@@ -6,12 +6,14 @@ export type StoreProduct = {
   slug: string;
   line: ProductLine;
   description: string | null;
-  price: number;
+  /** Nulo significa "a consultar": se cotiza por mensaje y no entra al carrito. */
+  price: number | null;
   stock: number | null;
   images: string[];
 };
 
-export type CartItem = StoreProduct & {
+export type CartItem = Omit<StoreProduct, "price"> & {
+  price: number;
   quantity: number;
 };
 

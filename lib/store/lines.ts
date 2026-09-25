@@ -1,4 +1,6 @@
-export type ProductLine = "calma" | "lectura" | "escena" | "servicio";
+export const productLineSlugs = ["calma", "lectura", "juegos", "escena", "hogar", "coleccion", "servicio"] as const;
+
+export type ProductLine = (typeof productLineSlugs)[number];
 
 export type LineMeta = {
   slug: ProductLine;
@@ -15,7 +17,7 @@ export type LineMeta = {
   cardGradient: string;
 };
 
-export const productLines: LineMeta[] = [
+export const productLines = [
   {
     slug: "calma",
     nav: "Calma",
@@ -43,6 +45,19 @@ export const productLines: LineMeta[] = [
     cardGradient: "from-[#323036] to-[#161419] text-white",
   },
   {
+    slug: "juegos",
+    nav: "Lúdica",
+    label: "Línea Lúdica",
+    badge: "Línea Lúdica",
+    detail: "Línea Lúdica",
+    home: {
+      name: "Línea Lúdica",
+      text: "Juegos, organizadores y accesorios para compartir nuevas aventuras alrededor de la mesa.",
+      gradient: "from-[#28625d] to-[#102d31]",
+    },
+    cardGradient: "from-[#235b57] to-[#0d292d] text-white",
+  },
+  {
     slug: "escena",
     nav: "Escena",
     label: "Línea Escena",
@@ -54,6 +69,32 @@ export const productLines: LineMeta[] = [
       gradient: "from-[#8a3fa8] to-[#2a1038]",
     },
     cardGradient: "from-[#71318f] to-[#20102c] text-white",
+  },
+  {
+    slug: "hogar",
+    nav: "Hogar",
+    label: "Línea Hogar",
+    badge: "Línea Hogar",
+    detail: "Línea Hogar",
+    home: {
+      name: "Línea Hogar",
+      text: "Piezas útiles y decorativas para ordenar y darle identidad a tu casa.",
+      gradient: "from-[#8a5a2b] to-[#2e1c0e]",
+    },
+    cardGradient: "from-[#7a4f26] to-[#26170b] text-white",
+  },
+  {
+    slug: "coleccion",
+    nav: "Colección",
+    label: "Línea Coleccionismo",
+    badge: "Coleccionismo",
+    detail: "Línea Coleccionismo",
+    home: {
+      name: "Coleccionismo",
+      text: "Figuras y réplicas para exhibir, inspiradas en videojuegos, anime y cultura pop.",
+      gradient: "from-[#2f4f8a] to-[#10192e]",
+    },
+    cardGradient: "from-[#2b4679] to-[#0f1727] text-white",
   },
   {
     slug: "servicio",
@@ -68,7 +109,7 @@ export const productLines: LineMeta[] = [
     },
     cardGradient: "from-[#5a565f] to-[#222025] text-white",
   },
-];
+] satisfies LineMeta[];
 
 const bySlug = new Map(productLines.map((line) => [line.slug, line]));
 
