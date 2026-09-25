@@ -68,6 +68,11 @@ export type Machine = {
 
 export const defaultMachines: Machine[] = [
   { id: "anycubic_kobra", name: "Anycubic Kobra / 2 / 3 / Neo", f_factor: 2.5, watts: 150, price: 300, lifespanHours: 3000, maintenanceMonthly: 6, hoursPerMonth: 90 },
+  // Kobra X: precio y velocidad publicados por Anycubic (USD 279, 600 mm/s, 20.000 mm/s²).
+  // Los 1450 W de la ficha son potencia nominal, el pico al calentar; el
+  // consumo promedio imprimiendo se estima en 180 W por comparación con otras
+  // bedslinger rápidas. Vida útil, mantenimiento y horas son estimados.
+  { id: "anycubic_kobra_x", name: "Anycubic Kobra X", f_factor: 3, watts: 180, price: 279, lifespanHours: 3500, maintenanceMonthly: 6, hoursPerMonth: 100 },
   { id: "artillery_genius", name: "Artillery Genius / Sidewinder X1-X2", f_factor: 1.2, watts: 110, price: 350, lifespanHours: 3000, maintenanceMonthly: 6, hoursPerMonth: 80 },
   { id: "bambu_a1", name: "Bambu Lab A1 / Mini", f_factor: 3, watts: 130, price: 400, lifespanHours: 4000, maintenanceMonthly: 4, hoursPerMonth: 120 },
   { id: "bambu_p1s", name: "Bambu Lab P1S", f_factor: 3.5, watts: 300, price: 700, lifespanHours: 5000, maintenanceMonthly: 5, hoursPerMonth: 150 },
@@ -157,7 +162,7 @@ export function createInitialState(region: Region = regions[1], tariff?: TariffS
     currencyIso: region.currencyIso,
     locale: region.locale,
     exchangeRate: region.exchangeRate,
-    machineId: "anycubic_kobra",
+    machineId: "anycubic_kobra_x",
     material: "PLA",
     materialPricePerKg: region.defaultMaterialCost,
     gramsTotal: 0,
