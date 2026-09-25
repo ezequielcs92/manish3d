@@ -42,7 +42,7 @@ export default async function SolicitudesPage() {
       </header>
 
       <section className="rounded-[2rem] border border-[#441a66]/10 bg-white p-6 shadow-[0_18px_60px_rgba(16,9,27,0.07)]">
-        <div className="divide-y divide-black/10">
+        <div className="divide-y divide-[#441a66]/10">
           {requests?.length ? (
             requests.map((request) => (
               <article key={request.id} className="grid gap-3 py-5 first:pt-0 md:grid-cols-[1fr_auto] md:items-start">

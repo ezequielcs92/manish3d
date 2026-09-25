@@ -40,25 +40,25 @@ export default async function AdminPage() {
 
   return (
     <div className="space-y-6">
-      <header className="rounded-[2rem] border border-black/10 bg-[#fbf4ea] p-6">
-        <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#a15f1b]">Dashboard</p>
+      <header className="rounded-[2rem] border border-[#441a66]/10 bg-white shadow-[0_18px_60px_rgba(16,9,27,0.07)] p-6">
+        <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#8a62ab]">Dashboard</p>
         <div className="mt-3 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <h1 className="text-4xl font-semibold tracking-tight">Pulso del taller</h1>
-            <p className="mt-2 max-w-2xl text-[#6f5845]">
+            <h1 className="text-4xl font-black tracking-tight text-[#441a66]">Pulso del taller</h1>
+            <p className="mt-2 max-w-2xl text-[#545454]">
               Vista rápida para saber qué producir, cuánto se vendió y qué necesita atención.
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
             <Link
               href="/admin/calculadora"
-              className="rounded-full border border-[#21170f]/20 bg-white px-5 py-3 text-center text-sm font-semibold text-[#21170f] transition hover:border-[#21170f]/40"
+              className="rounded-full border border-[#441a66]/20 bg-white px-5 py-3 text-center text-sm font-semibold text-[#441a66] transition hover:border-[#441a66]/40"
             >
               Calculadora de precios
             </Link>
             <Link
               href="/admin/pedidos"
-              className="rounded-full bg-[#21170f] px-5 py-3 text-center text-sm font-semibold text-[#fff7ed] transition hover:bg-[#3a2a1e]"
+              className="rounded-full bg-[#441a66] px-5 py-3 text-center text-sm font-semibold text-white transition hover:bg-[#6f2fa3]"
             >
               Cargar pedido
             </Link>
@@ -72,31 +72,31 @@ export default async function AdminPage() {
         <MetricCard label="Productos activos" value={String(activeProducts ?? 0)} detail="Visibles para tienda pública" />
       </section>
 
-      <section className="rounded-[2rem] border border-black/10 bg-[#fbf4ea] p-6">
+      <section className="rounded-[2rem] border border-[#441a66]/10 bg-white shadow-[0_18px_60px_rgba(16,9,27,0.07)] p-6">
         <div className="flex items-center justify-between gap-4">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#8b6b4e]">Tira de producción</p>
-            <h2 className="mt-2 text-2xl font-semibold">Últimos pedidos</h2>
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#6b6472]">Tira de producción</p>
+            <h2 className="mt-2 text-2xl font-black text-[#441a66]">Últimos pedidos</h2>
           </div>
-          <Link href="/admin/pedidos" className="text-sm font-semibold text-[#a15f1b]">
+          <Link href="/admin/pedidos" className="text-sm font-semibold text-[#8a62ab]">
             Ver todos
           </Link>
         </div>
 
-        <div className="mt-5 divide-y divide-black/10">
+        <div className="mt-5 divide-y divide-[#441a66]/10">
           {latestOrders?.length ? (
             latestOrders.map((order) => (
               <article key={order.id} className="grid gap-3 py-4 md:grid-cols-[1fr_auto_auto] md:items-center">
                 <div>
                   <p className="font-semibold">{order.client_name}</p>
-                  <p className="text-sm text-[#6f5845]">{order.channel} · {money(Number(order.total))}</p>
+                  <p className="text-sm text-[#545454]">{order.channel} · {money(Number(order.total))}</p>
                 </div>
                 <StatusPill status={order.status} />
                 <StatusPill status={order.payment_status} />
               </article>
             ))
           ) : (
-            <p className="py-8 text-sm text-[#6f5845]">Todavía no hay pedidos cargados.</p>
+            <p className="py-8 text-sm text-[#545454]">Todavía no hay pedidos cargados.</p>
           )}
         </div>
       </section>

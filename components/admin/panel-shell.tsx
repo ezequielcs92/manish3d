@@ -23,7 +23,7 @@ export function PanelShell({
 }) {
   return (
     <main className="brand-grid min-h-screen bg-[#f8f8f8] text-[#10091b]">
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-4 sm:px-6 lg:flex-row lg:py-6">
+      <div className="flex w-full flex-col gap-6 px-4 py-4 sm:px-6 lg:flex-row lg:py-6 xl:px-8">
         <aside className="rounded-[2rem] border border-white/10 bg-[#10091b] p-4 text-white shadow-[0_28px_90px_rgba(16,9,27,0.22)] lg:sticky lg:top-6 lg:h-[calc(100vh-3rem)] lg:w-72">
           <Link href="/admin" className="block rounded-[1.5rem] bg-white p-4 text-[#10091b] shadow-[0_18px_55px_rgba(0,0,0,0.18)]">
             <Image src="/brand/logo-horizontal.png" alt="Manish 3D" width={170} height={48} className="h-auto w-40" />

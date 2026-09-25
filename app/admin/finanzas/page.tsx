@@ -22,52 +22,52 @@ export default async function FinanzasPage() {
 
   return (
     <div className="grid gap-6 xl:grid-cols-[1fr_24rem]">
-      <section className="rounded-[2rem] border border-black/10 bg-[#fbf4ea] p-6">
-        <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#a15f1b]">Finanzas</p>
-        <h1 className="mt-3 text-4xl font-semibold tracking-tight">Caja operativa</h1>
+      <section className="rounded-[2rem] border border-[#441a66]/10 bg-white shadow-[0_18px_60px_rgba(16,9,27,0.07)] p-6">
+        <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#8a62ab]">Finanzas</p>
+        <h1 className="mt-3 text-4xl font-black tracking-tight text-[#441a66]">Caja operativa</h1>
         <div className="mt-6 grid gap-4 md:grid-cols-3">
-          <div className="rounded-3xl border border-black/10 bg-[#fff8ef] p-4">
-            <p className="text-sm text-[#6f5845]">Ingresos</p>
+          <div className="rounded-3xl border border-[#441a66]/10 bg-[#faf7fc] p-4">
+            <p className="text-sm text-[#545454]">Ingresos</p>
             <p className="mt-2 font-mono text-2xl font-semibold tabular-nums">{money(income)}</p>
           </div>
-          <div className="rounded-3xl border border-black/10 bg-[#fff8ef] p-4">
-            <p className="text-sm text-[#6f5845]">Costos/gastos</p>
+          <div className="rounded-3xl border border-[#441a66]/10 bg-[#faf7fc] p-4">
+            <p className="text-sm text-[#545454]">Costos/gastos</p>
             <p className="mt-2 font-mono text-2xl font-semibold tabular-nums">{money(costs)}</p>
           </div>
-          <div className="rounded-3xl border border-black/10 bg-[#fff8ef] p-4">
-            <p className="text-sm text-[#6f5845]">Saldo operativo</p>
+          <div className="rounded-3xl border border-[#441a66]/10 bg-[#faf7fc] p-4">
+            <p className="text-sm text-[#545454]">Saldo operativo</p>
             <p className="mt-2 font-mono text-2xl font-semibold tabular-nums">{money(income - costs)}</p>
           </div>
         </div>
 
-        <div className="mt-6 divide-y divide-black/10">
+        <div className="mt-6 divide-y divide-[#441a66]/10">
           {transactions?.length ? (
             transactions.map((transaction) => (
               <article key={transaction.id} className="grid gap-2 py-4 md:grid-cols-[1fr_auto] md:items-center">
                 <div>
                   <p className="font-semibold">{transaction.type}</p>
-                  <p className="text-sm text-[#6f5845]">{transaction.description ?? "sin descripción"}</p>
+                  <p className="text-sm text-[#545454]">{transaction.description ?? "sin descripción"}</p>
                 </div>
                 <span className="font-mono text-sm font-semibold tabular-nums">{money(Number(transaction.amount))}</span>
               </article>
             ))
           ) : (
-            <p className="py-8 text-sm text-[#6f5845]">No hay movimientos cargados.</p>
+            <p className="py-8 text-sm text-[#545454]">No hay movimientos cargados.</p>
           )}
         </div>
       </section>
 
-      <aside className="rounded-[2rem] border border-black/10 bg-[#fbf4ea] p-6 xl:self-start">
-        <h2 className="text-2xl font-semibold">Nuevo movimiento</h2>
+      <aside className="rounded-[2rem] border border-[#441a66]/10 bg-white shadow-[0_18px_60px_rgba(16,9,27,0.07)] p-6 xl:self-start">
+        <h2 className="text-2xl font-black text-[#441a66]">Nuevo movimiento</h2>
         <form action={createTransaction} className="mt-5 space-y-4">
-          <select name="type" className="w-full rounded-2xl border border-black/10 bg-[#f4eadc] px-4 py-3 outline-none focus:ring-2 focus:ring-[#a15f1b]">
+          <select name="type" className="w-full rounded-2xl border border-[#441a66]/10 bg-[#f5f2f8] px-4 py-3 outline-none focus:ring-2 focus:ring-[#8a62ab]">
             <option value="ingreso">Ingreso</option>
             <option value="costo_material">Costo material</option>
             <option value="gasto_operativo">Gasto operativo</option>
           </select>
-          <input name="amount" required type="number" min="0" step="0.01" placeholder="Monto" className="w-full rounded-2xl border border-black/10 bg-[#f4eadc] px-4 py-3 outline-none focus:ring-2 focus:ring-[#a15f1b]" />
-          <textarea name="description" placeholder="Descripción" className="min-h-28 w-full rounded-2xl border border-black/10 bg-[#f4eadc] px-4 py-3 outline-none focus:ring-2 focus:ring-[#a15f1b]" />
-          <button className="w-full rounded-full bg-[#21170f] px-5 py-3 text-sm font-semibold text-[#fff7ed] transition hover:bg-[#3a2a1e]">Guardar movimiento</button>
+          <input name="amount" required type="number" min="0" step="0.01" placeholder="Monto" className="w-full rounded-2xl border border-[#441a66]/10 bg-[#f5f2f8] px-4 py-3 outline-none focus:ring-2 focus:ring-[#8a62ab]" />
+          <textarea name="description" placeholder="Descripción" className="min-h-28 w-full rounded-2xl border border-[#441a66]/10 bg-[#f5f2f8] px-4 py-3 outline-none focus:ring-2 focus:ring-[#8a62ab]" />
+          <button className="w-full rounded-full bg-[#441a66] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#6f2fa3]">Guardar movimiento</button>
         </form>
       </aside>
     </div>
