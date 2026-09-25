@@ -71,14 +71,15 @@ export const productLines = [
     cardGradient: "from-[#71318f] to-[#20102c] text-white",
   },
   {
+    // Se presenta como Rutina; el slug queda "hogar", que es lo que se busca.
     slug: "hogar",
-    nav: "Hogar",
-    label: "Línea Hogar",
-    badge: "Línea Hogar",
-    detail: "Línea Hogar",
+    nav: "Rutina",
+    label: "Línea Rutina",
+    badge: "Línea Rutina",
+    detail: "Línea Rutina",
     home: {
-      name: "Línea Hogar",
-      text: "Piezas útiles y decorativas para ordenar y darle identidad a tu casa.",
+      name: "Línea Rutina",
+      text: "Piezas útiles para el día a día: ordenar, colgar y tener todo a mano, con diseño.",
       gradient: "from-[#8a5a2b] to-[#2e1c0e]",
     },
     cardGradient: "from-[#7a4f26] to-[#26170b] text-white",
