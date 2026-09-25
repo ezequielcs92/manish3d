@@ -16,7 +16,7 @@ export default async function ProductosPage() {
   const supabase = await createClient();
   const { data: products } = await supabase
     .from("products")
-    .select("id, name, slug, line, price, cost, stock, weight_grams, images, active")
+    .select("id, name, slug, line, extra_lines, price, cost, stock, weight_grams, images, active")
     .order("created_at", { ascending: false });
 
   return (
@@ -50,13 +50,24 @@ export default async function ProductosPage() {
                         </span>
                       </p>
                     </td>
-                    <td className="px-4 py-4">{getLine(product.line)?.badge ?? product.line}</td>
+                    <td className="px-4 py-4">
+                      {getLine(product.line)?.badge ?? product.line}
+                      {product.extra_lines?.length ? (
+                        <p className="mt-1 text-xs text-[#8b6b4e]">
+                          También en {product.extra_lines.map((slug: string) => getLine(slug)?.nav ?? slug).join(", ")}
+                        </p>
+                      ) : null}
+                    </td>
                     <td className="px-4 py-4" colSpan={4}>
                       <form action={updateProduct} className="flex flex-wrap items-center gap-2">
                         <input type="hidden" name="id" value={product.id} />
+                        <select name="price_mode" defaultValue={product.price === null ? "consultar" : "precio"} className={celdaClass}>
+                          <option value="precio">Con precio</option>
+                          <option value="consultar">A consultar</option>
+                        </select>
                         <label className="flex items-center gap-1 text-xs text-[#8b6b4e]">
                           Precio
-                          <input name="price" type="number" min="0" step="0.01" placeholder="consultar" defaultValue={product.price ?? ""} className={celdaClass} />
+                          <input name="price" type="number" min="0" step="0.01" defaultValue={product.price ?? ""} className={celdaClass} />
                         </label>
                         <label className="flex items-center gap-1 text-xs text-[#8b6b4e]">
                           Costo
@@ -73,6 +84,24 @@ export default async function ProductosPage() {
                         <label className="flex items-center gap-1 text-xs font-medium text-[#6f5845]">
                           <input name="active" type="checkbox" defaultChecked={product.active} /> Activo
                         </label>
+                        <details className="text-xs text-[#8b6b4e]">
+                          <summary className="cursor-pointer select-none">También en…</summary>
+                          <div className="mt-2 flex flex-wrap gap-3">
+                            {productLines
+                              .filter((line) => line.slug !== product.line)
+                              .map((line) => (
+                                <label key={line.slug} className="flex items-center gap-1">
+                                  <input
+                                    type="checkbox"
+                                    name="extra_lines"
+                                    value={line.slug}
+                                    defaultChecked={product.extra_lines?.includes(line.slug)}
+                                  />
+                                  {line.nav}
+                                </label>
+                              ))}
+                          </div>
+                        </details>
                         <label className="flex items-center gap-1 text-xs text-[#8b6b4e]">
                           Fotos ({product.images?.length ?? 0}/6)
                           <input
@@ -127,8 +156,16 @@ export default async function ProductosPage() {
             <p className="mt-2 text-xs text-[#8b6b4e]">Hasta 6 fotos, 5 MB cada una. JPG, PNG, WebP o AVIF.</p>
           </div>
           <textarea name="image_urls" placeholder="O pegá URLs de imágenes ya publicadas, una por línea" className="min-h-20 w-full rounded-2xl border border-black/10 bg-[#f4eadc] px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-[#a15f1b]" />
+          <fieldset className="flex flex-wrap gap-4 text-sm font-medium text-[#6f5845]">
+            <label className="flex items-center gap-2">
+              <input type="radio" name="price_mode" value="precio" defaultChecked /> Con precio
+            </label>
+            <label className="flex items-center gap-2">
+              <input type="radio" name="price_mode" value="consultar" /> Precio a consultar
+            </label>
+          </fieldset>
           <div className="grid grid-cols-2 gap-3">
-            <input name="price" type="number" min="0" step="0.01" placeholder="Precio (vacío = a consultar)" className="rounded-2xl border border-black/10 bg-[#f4eadc] px-4 py-3 outline-none focus:ring-2 focus:ring-[#a15f1b]" />
+            <input name="price" type="number" min="0" step="0.01" placeholder="Precio" className="rounded-2xl border border-black/10 bg-[#f4eadc] px-4 py-3 outline-none focus:ring-2 focus:ring-[#a15f1b]" />
             <input name="cost" type="number" min="0" step="0.01" placeholder="Costo" className="rounded-2xl border border-black/10 bg-[#f4eadc] px-4 py-3 outline-none focus:ring-2 focus:ring-[#a15f1b]" />
           </div>
           <div className="grid grid-cols-2 gap-3">
@@ -136,6 +173,16 @@ export default async function ProductosPage() {
             <input name="weight_grams" type="number" min="0" placeholder="Peso en gramos" className="rounded-2xl border border-black/10 bg-[#f4eadc] px-4 py-3 outline-none focus:ring-2 focus:ring-[#a15f1b]" />
           </div>
           <p className="-mt-1 text-xs text-[#8b6b4e]">El peso se usa para cotizar el envío con Andreani. Sin peso, ese producto no se puede cotizar.</p>
+          <fieldset>
+            <legend className="text-xs font-bold uppercase tracking-[0.16em] text-[#8b6b4e]">También aparece en</legend>
+            <div className="mt-2 flex flex-wrap gap-3 text-sm text-[#6f5845]">
+              {productLines.map((line) => (
+                <label key={line.slug} className="flex items-center gap-1.5">
+                  <input type="checkbox" name="extra_lines" value={line.slug} /> {line.nav}
+                </label>
+              ))}
+            </div>
+          </fieldset>
           <label className="flex items-center gap-2 text-sm font-medium text-[#6f5845]">
             <input name="active" type="checkbox" defaultChecked /> Activo en tienda
           </label>

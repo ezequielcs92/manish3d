@@ -51,8 +51,9 @@ export default async function TiendaPage({
       .eq("active", true)
       .order("created_at", { ascending: false });
 
+    // Entra si es su línea principal o una de las adicionales.
     if (isProductLine(linea)) {
-      query = query.eq("line", linea);
+      query = query.or(`line.eq.${linea},extra_lines.cs.{${linea}}`);
     }
 
     const { data } = await query;

@@ -71,6 +71,22 @@ async function subirFotos(
   return urls;
 }
 
+/**
+ * Precio según lo que se eligió en el panel: "consultar" lo deja nulo aunque el
+ * campo tenga un número. Con precio elegido pero vacío también queda a
+ * consultar, que es lo seguro: nunca se publica en $0.
+ */
+function getPrice(formData: FormData) {
+  if (getString(formData, "price_mode") === "consultar") return null;
+  return getNullableNumber(formData, "price");
+}
+
+/** Líneas adicionales marcadas, sin repetir y sin la principal. */
+function getExtraLines(formData: FormData, principal: string) {
+  const marcadas = formData.getAll("extra_lines").map(String).filter(isProductLine);
+  return [...new Set(marcadas)].filter((line) => line !== principal);
+}
+
 export async function createProduct(formData: FormData) {
   const supabase = await createClient();
   const name = getString(formData, "name");
@@ -87,11 +103,12 @@ export async function createProduct(formData: FormData) {
     slug,
     line,
     description: getString(formData, "description") || null,
-    price: getNullableNumber(formData, "price"),
+    price: getPrice(formData),
     cost: getNumber(formData, "cost"),
     stock: getNullableNumber(formData, "stock"),
     weight_grams: getNullableNumber(formData, "weight_grams"),
     images,
+    extra_lines: getExtraLines(formData, line),
     active: formData.get("active") === "on",
   });
 
@@ -111,7 +128,7 @@ export async function updateProduct(formData: FormData) {
 
   if (!id) return;
 
-  const { data: actual } = await supabase.from("products").select("slug, images").eq("id", id).single();
+  const { data: actual } = await supabase.from("products").select("slug, line, images").eq("id", id).single();
   if (!actual) return;
 
   const subidas = await subirFotos(supabase, formData, actual.slug);
@@ -120,11 +137,12 @@ export async function updateProduct(formData: FormData) {
   await supabase
     .from("products")
     .update({
-      price: getNullableNumber(formData, "price"),
+      price: getPrice(formData),
       cost: getNumber(formData, "cost"),
       stock: getNullableNumber(formData, "stock"),
       weight_grams: getNullableNumber(formData, "weight_grams"),
       images,
+      extra_lines: getExtraLines(formData, actual.line),
       active: formData.get("active") === "on",
     })
     .eq("id", id);

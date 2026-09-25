@@ -12,3 +12,9 @@ alter type public.product_line add value if not exists 'hogar';
 alter type public.product_line add value if not exists 'coleccion';
 
 alter table public.products alter column price drop not null;
+
+-- Un producto puede aparecer en más de una línea (ej. la Espada Maestra en
+-- Escena y en Coleccionismo). "line" sigue siendo la principal, la que se ve en
+-- la tarjeta; estas son las adicionales donde también se lista.
+alter table public.products
+  add column if not exists extra_lines public.product_line[] not null default '{}';
